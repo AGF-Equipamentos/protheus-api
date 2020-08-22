@@ -18,9 +18,6 @@ jobs:
 
     - name: install dependencies
       run: yarn
-    
-    - name: Run build
-      run: yarn build
       
     - name: Copy dist to AWS
       uses: appleboy/scp-action@master
