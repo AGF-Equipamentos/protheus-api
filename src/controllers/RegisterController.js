@@ -4,7 +4,7 @@ module.exports = {
   async index(req, res) {
     const request = new sql.Request();
 
-    const { filial, op, produto } = req.headers;
+    const { filial, op, produto, busca_cod_produto, busca_desc_produto } = req.headers;
 
     if(filial!=null) {
       filial_condition = `SD4.D4_FILIAL IN (${filial}) AND`;
@@ -17,6 +17,14 @@ module.exports = {
     if(produto!=null) {
       produto_condition = `SB1.B1_COD IN ('${produto}') AND`;
     } else {produto_condition = ``;};
+
+    if(busca_cod_produto!=null) {
+      busca_cod_produto_condition = `SB1.B1_COD LIKE ('%${busca_cod_produto.toUpperCase()}%') AND`;
+    } else {busca_cod_produto_condition = ``;};
+
+    if(busca_desc_produto!=null) {
+      busca_desc_produto_condition = `SB1.B1_DESC LIKE ('%${busca_desc_produto.toUpperCase()}%') AND`;
+    } else {busca_desc_produto_condition = ``;};
            
     //CONCAT(SUBSTRING(SC2.C2_DATPRI,7,2),'/',SUBSTRING(SC2.C2_DATPRI,5,2),'/',SUBSTRING(SC2.C2_DATPRI,1,4)) AS ENTREGA
 
@@ -33,6 +41,8 @@ module.exports = {
             FROM	  SB1010 AS SB1 
 
             WHERE	  ${produto_condition}
+                    ${busca_cod_produto_condition}  
+                    ${busca_desc_produto_condition}  
                     SB1.D_E_L_E_T_ = ''
 
             `, function (err, recordset) {

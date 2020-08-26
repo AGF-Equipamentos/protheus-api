@@ -6,7 +6,7 @@
   "author": "arthurAGF <arthurpedroti@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "dev": "nodemon src/server.js",
+    "dev:server": "nodemon src/server.js",
     "serve": "pm2 start src/server.js",
     "servedev": "pm2 start src/server.js --watch"
   },
