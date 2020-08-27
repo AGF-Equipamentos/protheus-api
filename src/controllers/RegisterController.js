@@ -4,15 +4,11 @@ module.exports = {
   async index(req, res) {
     const request = new sql.Request();
 
-    const { filial, op, produto, busca_cod_produto, busca_desc_produto } = req.headers;
+    const { filial, produto, busca_cod_produto, busca_desc_produto } = req.headers;
 
     if(filial!=null) {
-      filial_condition = `SD4.D4_FILIAL IN (${filial}) AND`;
+      filial_condition = `SB1.B1_FILIAL IN ('${filial.slice(0,2)}') AND`;
     } else {filial_condition = ``;};
-
-    if(op!=null) {
-      op_condition = `SD4.D4_OP = ('${op}') AND`;
-    } else {op_condition = ``;};
 
     if(produto!=null) {
       produto_condition = `SB1.B1_COD IN ('${produto}') AND`;
@@ -32,6 +28,7 @@ module.exports = {
         await request.query(
             `
             SELECT
+                    RTRIM(SB1.B1_COD) AS CODIGO,
                     RTRIM(SB1.B1_DESC) AS DESCRICAO,
                     SB1.B1_EMIN AS PP,
                     SB1.B1_LE AS LE,
@@ -43,6 +40,7 @@ module.exports = {
             WHERE	  ${produto_condition}
                     ${busca_cod_produto_condition}  
                     ${busca_desc_produto_condition}  
+                    ${filial_condition}
                     SB1.D_E_L_E_T_ = ''
 
             `, function (err, recordset) {

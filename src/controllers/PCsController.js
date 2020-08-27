@@ -35,6 +35,7 @@ module.exports = {
                     SC7.C7_QUANT AS QTD,
                     SC7.C7_QUJE AS QTD_ENT,
                     SC7.C7_PRECO AS PRECO,
+                    SC7.C7_NUMSC AS NUMSC,
                     RTRIM(SC7.C7_OBS) AS OBS,
                     SC7.C7_FORNECE AS FORN,
                     CONCAT(SUBSTRING(SC7.C7_DATPRF,7,2),'/',SUBSTRING(SC7.C7_DATPRF,5,2),'/',SUBSTRING(SC7.C7_DATPRF,1,4)) AS ENTREGA,
@@ -42,7 +43,7 @@ module.exports = {
 
             FROM	  SC7010 AS SC7 INNER JOIN
                     SB1010 AS SB1 ON SB1.D_E_L_E_T_ = '' AND SB1.B1_COD = SC7.C7_PRODUTO LEFT OUTER JOIN
-                    SA2010 AS SA2 ON (SA2.D_E_L_E_T_ = '' AND SA2.A2_FILIAL = '01') AND SA2.A2_COD = SC7.C7_FORNECE
+                    SA2010 AS SA2 ON SA2.D_E_L_E_T_ = '' AND SA2.A2_FILIAL = LEFT('${filial}', 2) AND SA2.A2_COD = SC7.C7_FORNECE
             WHERE	  ${pc_condition}
                     ${filial_condition}
                     ${produto_condition}
