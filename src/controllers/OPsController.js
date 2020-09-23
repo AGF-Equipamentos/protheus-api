@@ -4,7 +4,11 @@ module.exports = {
   async index(req, res) {
     const request = new sql.Request();
 
-    const { filial, obs } = req.headers;
+    const { filial, obs, produto } = req.headers;
+
+    if(produto!=null) {
+      produto_condition = `SC2.C2_PRODUTO IN ('${produto}') AND`;
+    } else {produto_condition = ``;};
 
     if(filial!=null) {
       filial_condition = `SC2.C2_FILIAL IN (${filial}) AND`;
@@ -32,6 +36,7 @@ module.exports = {
                     SB1010 AS SB1 ON SB1.D_E_L_E_T_ = '' AND SB1.B1_COD = SC2.C2_PRODUTO
 
             WHERE   ${filial_condition}
+                    ${produto_condition}
                     ${obs_condition}
                     (SC2.C2_DATRF = '') AND 
                     (SC2.D_E_L_E_T_ = '')
