@@ -4,7 +4,7 @@ module.exports = {
   async index(req, res) {
     const request = new sql.Request();
 
-    const { filial, produto, grupo, ano, mes } = req.query;
+    const { filial, produto, grupo, ano, mes, devolution } = req.query;
 
     if(filial!=null) {
       filial_condition = `F2_FILIAL IN (${filial}) AND`;
@@ -25,6 +25,12 @@ module.exports = {
     if(mes!=null) {
       mes_condition = `MES IN (${mes}) AND`;
     } else {mes_condition = ``;};
+
+    if(devolution!=null) {
+      if(devolution==="no") {
+        devolution_condition = `VALOR_LIQUIDO_NF > 0 AND`;
+      } else {devolution_condition = ``;};
+    } else {devolution_condition = ``;};
            
         // query to the database and get the records
         await request.query(
@@ -33,6 +39,7 @@ module.exports = {
                     RTRIM(D2_COD) AS PRODUTO,
                     ANO,
                     MES,
+                    MARGEM,
                     D2_QUANT AS QTD
 
             FROM    FATURAMENTO
@@ -42,6 +49,7 @@ module.exports = {
                     ${grupo_condition}
                     ${ano_condition}
                     ${mes_condition}
+                    ${devolution_condition}
                     (F4_DUPLIC = 'S')
 
             ORDER BY D2_COD
