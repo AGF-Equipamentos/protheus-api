@@ -14,6 +14,7 @@ module.exports = {
                     RTRIM(SA1.A1_NOME) AS razao_social,
                     RTRIM(SA1.A1_CGC) AS cnpj,
                     RTRIM(SA1.A1_INSCR) AS inscricao_estadual,
+                    RTRIM(SA1.A1_CONTRIB) AS contribuinte,
                     RTRIM(SA1.A1_END) AS endereco,
                     RTRIM(SA1.A1_BAIRRO) AS bairro,
                     RTRIM(SA1.A1_MUN) AS municipio,
