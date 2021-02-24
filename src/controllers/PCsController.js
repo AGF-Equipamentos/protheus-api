@@ -4,7 +4,7 @@ module.exports = {
   async index(req, res) {
     const request = new sql.Request();
 
-    const { filial, pc, produto, finalizado } = req.headers;
+    const { filial, pc, produto, finalizado, cnpj } = req.headers;
 
     if(filial!=null) {
       filial_condition = `SC7.C7_FILIAL IN (${filial}) AND`;
@@ -13,6 +13,10 @@ module.exports = {
     if(pc!=null) {
       pc_condition = `SC7.C7_NUM = ('${pc}') AND`;
     } else {pc_condition = ``;};
+
+    if(cnpj!=null) {
+      cnpj_condition = `SA2.A2_CGC = ('${cnpj}') AND`;
+    } else {cnpj_condition = ``;};
 
     if(produto!=null) {
       produto_condition = `SC7.C7_PRODUTO IN ('${produto}') AND`;
@@ -39,7 +43,8 @@ module.exports = {
                     RTRIM(SC7.C7_OBS) AS OBS,
                     SC7.C7_FORNECE AS FORN,
                     CONCAT(SUBSTRING(SC7.C7_DATPRF,7,2),'/',SUBSTRING(SC7.C7_DATPRF,5,2),'/',SUBSTRING(SC7.C7_DATPRF,1,4)) AS ENTREGA,
-                    RTRIM(SA2.A2_NREDUZ) AS DESC_FORN
+                    RTRIM(SA2.A2_NREDUZ) AS DESC_FORN,
+                    RTRIM(SA2.A2_CGC) AS CNPJ
 
             FROM	  SC7010 AS SC7 INNER JOIN
                     SB1010 AS SB1 ON SB1.D_E_L_E_T_ = '' AND SB1.B1_COD = SC7.C7_PRODUTO LEFT OUTER JOIN
@@ -48,6 +53,7 @@ module.exports = {
                     ${filial_condition}
                     ${produto_condition}
                     ${finalizado_condition}
+                    ${cnpj_condition}
                     SC7.C7_RESIDUO = '' AND
                     SC7.D_E_L_E_T_ = ''
 
