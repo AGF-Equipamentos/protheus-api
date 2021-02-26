@@ -5,6 +5,7 @@ module.exports = {
     const request = new sql.Request();
 
     const { filial, obs, produto, op_number } = req.headers;
+    console.log(op_number);
 
     if(produto!=null) {
       produto_condition = `SC2.C2_PRODUTO IN ('${produto}') AND`;
