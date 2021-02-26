@@ -4,7 +4,7 @@ module.exports = {
   async index(req, res) {
     const request = new sql.Request();
 
-    const { filial, obs, produto } = req.headers;
+    const { filial, obs, produto, op_number } = req.headers;
 
     if(produto!=null) {
       produto_condition = `SC2.C2_PRODUTO IN ('${produto}') AND`;
@@ -17,6 +17,14 @@ module.exports = {
     if(obs!=null) {
       obs_condition = `(SC2.C2_OBS LIKE '%${obs}%') AND`;
     } else {obs_condition = ``;};
+
+    if(op_number!=null) {
+      op_number_condition = `
+      (SC2.C2_NUM = '${op_number.slice(0,6)}') AND
+      (SC2.C2_ITEM = '${op_number.slice(6,8)}') AND
+      (SC2.C2_SEQUEN = '${op_number.slice(8,11)}') AND
+      `;
+    } else {op_number_condition = ``;};
            
         // query to the database and get the records
         await request.query(
@@ -38,6 +46,7 @@ module.exports = {
             WHERE   ${filial_condition}
                     ${produto_condition}
                     ${obs_condition}
+                    ${op_number_condition}
                     (SC2.C2_DATRF = '') AND 
                     (SC2.D_E_L_E_T_ = '')
 
