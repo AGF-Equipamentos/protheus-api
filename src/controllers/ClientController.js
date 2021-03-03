@@ -27,6 +27,7 @@ module.exports = {
             FROM    SA1010 AS SA1
 
             WHERE	  
+                    SA1.A1_MSBLQL <> 1 AND
                     SA1.D_E_L_E_T_ = ''
 
             `, function (err, recordset) {
