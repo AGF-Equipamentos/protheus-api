@@ -37,6 +37,8 @@ module.exports = {
             `
             SELECT  
                     RTRIM(D2_COD) AS PRODUTO,
+                    RTRIM(B1_DESC) AS DESCRICAO,
+                    RTRIM(D2_TOTAL) AS VALOR,
                     ANO,
                     MES,
                     MARGEM,
