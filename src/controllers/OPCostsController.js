@@ -32,6 +32,7 @@ module.exports = {
             SELECT  OP,
                     FILIAL,
                     PRODUTO,
+                    DESCRICAO,
                     GRUPO,
                     CUSTO,
                     MES,
