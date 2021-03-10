@@ -4,7 +4,7 @@ module.exports = {
   async index(req, res) {
     const request = new sql.Request();
 
-    const { filial, pc, produto, finalizado, cnpj } = req.headers;
+    const { filial, pc, produto, grupo, finalizado, cnpj } = req.headers;
 
     if(filial!=null) {
       filial_condition = `SC7.C7_FILIAL IN (${filial}) AND`;
@@ -13,6 +13,10 @@ module.exports = {
     if(pc!=null) {
       pc_condition = `SC7.C7_NUM = ('${pc}') AND`;
     } else {pc_condition = ``;};
+
+    if(grupo!=null) {
+      grupo_condition = `SB1.B1_GRUPO = ('${grupo}') AND`;
+    } else {grupo_condition = ``;};
 
     if(cnpj!=null) {
       cnpj_condition = `SA2.A2_CGC = ('${cnpj}') AND`;
@@ -52,6 +56,7 @@ module.exports = {
             WHERE	  ${pc_condition}
                     ${filial_condition}
                     ${produto_condition}
+                    ${grupo_condition}
                     ${finalizado_condition}
                     ${cnpj_condition}
                     SC7.C7_RESIDUO = '' AND
