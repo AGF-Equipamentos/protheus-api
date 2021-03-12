@@ -5,7 +5,7 @@ module.exports = {
     const request = new sql.Request();
 
     //querry request need to declare all the variables!
-    const { filial, produto, grupo, armazem } = req.headers;
+    const { filial, produto, grupo, armazem } = req.query;
 
     if(filial!=null) {
       filial_condition = `FILIAL IN (${filial}) AND`;

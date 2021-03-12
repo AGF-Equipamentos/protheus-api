@@ -4,7 +4,7 @@ module.exports = {
   async index(req, res) {
     const request = new sql.Request();
 
-    const { filial, pc, produto, grupo, finalizado, cnpj } = req.headers;
+    const { filial, pc, produto, grupo, finalizado, cnpj } = req.query;
 
     if(filial!=null) {
       filial_condition = `SC7.C7_FILIAL IN (${filial}) AND`;

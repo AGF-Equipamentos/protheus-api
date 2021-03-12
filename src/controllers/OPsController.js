@@ -4,8 +4,7 @@ module.exports = {
   async index(req, res) {
     const request = new sql.Request();
 
-    const { filial, obs, produto, opnumber } = req.headers;
-    console.log(opnumber);
+    const { filial, obs, produto, opnumber, fechado, ano, mes } = req.query;
 
     if(produto!=null) {
       produto_condition = `SC2.C2_PRODUTO IN ('${produto}') AND`;
@@ -19,6 +18,12 @@ module.exports = {
       obs_condition = `(SC2.C2_OBS LIKE '%${obs}%') AND`;
     } else {obs_condition = ``;};
 
+    if(fechado!=null && fechado === 'true') {
+      fechado_condition = `SC2.C2_DATRF <> '' AND`;
+    } else if (fechado!=null && fechado === 'false') {
+      fechado_condition = `SC2.C2_DATRF = '' AND`;
+    } else {fechado_condition = ``;};
+
     if(opnumber!=null) {
       opnumber_condition = `
       (SC2.C2_NUM = '${opnumber.slice(0,6)}') AND
@@ -26,6 +31,18 @@ module.exports = {
       (SC2.C2_SEQUEN = '${opnumber.slice(8,11)}') AND
       `;
     } else {opnumber_condition = ``;};
+
+    if(mes!=null) {
+      mes_condition = `
+      (SUBSTRING(SC2.C2_DATRF,5,2) = '${mes}') AND
+      `;
+    } else {mes_condition = ``;};
+
+    if(ano!=null) {
+      ano_condition = `
+      (SUBSTRING(SC2.C2_DATRF,1,4) = '${ano}') AND
+      `;
+    } else {ano_condition = ``;};
            
         // query to the database and get the records
         await request.query(
@@ -37,6 +54,9 @@ module.exports = {
                     SC2.C2_QUANT AS QTD,
                     CONCAT(SUBSTRING(SC2.C2_DATPRI,7,2),'/',SUBSTRING(SC2.C2_DATPRI,5,2),'/',SUBSTRING(SC2.C2_DATPRI,1,4)) AS DAT_INI,
                     CONCAT(SUBSTRING(SC2.C2_DATPRF,7,2),'/',SUBSTRING(SC2.C2_DATPRF,5,2),'/',SUBSTRING(SC2.C2_DATPRF,1,4)) AS DAT_FIM,
+                    CONCAT(SUBSTRING(SC2.C2_DATRF,7,2),'/',SUBSTRING(SC2.C2_DATRF,5,2),'/',SUBSTRING(SC2.C2_DATRF,1,4)) AS DAT_REAL,
+                    SUBSTRING(SC2.C2_DATRF,5,2) AS MES_FIM,
+                    SUBSTRING(SC2.C2_DATRF,1,4) AS ANO_FIM,
                     RTRIM(SC2.C2_OBS) AS OBS,
                     CONCAT(SUBSTRING(SC2.C2_EMISSAO,7,2),'/',SUBSTRING(SC2.C2_EMISSAO,5,2),'/',SUBSTRING(SC2.C2_EMISSAO,1,4)) AS DAT_EMI,
                     SC2.C2_QUJE AS QTD_PRO
@@ -48,7 +68,9 @@ module.exports = {
                     ${produto_condition}
                     ${obs_condition}
                     ${opnumber_condition}
-                    (SC2.C2_DATRF = '') AND 
+                    ${fechado_condition}
+                    ${mes_condition}
+                    ${ano_condition}
                     (SC2.D_E_L_E_T_ = '')
 
             ORDER BY SC2.C2_DATPRI
