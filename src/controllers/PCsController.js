@@ -4,7 +4,7 @@ module.exports = {
   async index(req, res) {
     const request = new sql.Request();
 
-    const { filial, pc, produto, grupo, finalizado, cnpj } = req.query;
+    const { filial, pc, produto, grupo, finalizado, cnpj, legenda } = req.query;
 
     if(filial!=null) {
       filial_condition = `SC7.C7_FILIAL IN (${filial}) AND`;
@@ -29,6 +29,12 @@ module.exports = {
     if(finalizado!=null && finalizado) {
       finalizado_condition = `SC7.C7_QUANT <> SC7.C7_QUJE AND`;
     } else {finalizado_condition = ``;};
+
+    if(legenda!=null && legenda) {
+      legenda_condition = `CASE WHEN C7_RESIDUO <> '' THEN 'RESÍDUO ELIMINADO' WHEN C7_QTDACLA > 0 AND C7_RESIDUO = '' THEN 'PEDIDO USADO EM PRÉ-NOTA' WHEN C7_QUJE = 0 AND C7_QTDACLA = 0 AND 
+      C7_RESIDUO = '' THEN 'PENDENTE' WHEN C7_QUJE <> 0 AND C7_QUJE < C7_QUANT AND C7_RESIDUO = '' THEN 'ATENDIDO PARCIALMENTE' WHEN C7_QUJE >= C7_QUANT AND 
+      C7_RESIDUO = '' THEN 'PEDIDO ATENDIDO' ELSE '' END = ('${legenda}') AND`;
+    } else {legenda_condition = ``;};
            
         // query to the database and get the records
         await request.query(
@@ -42,10 +48,14 @@ module.exports = {
                     SC7.C7_UM AS UM,
                     SC7.C7_QUANT AS QTD,
                     SC7.C7_QUJE AS QTD_ENT,
+                    SC7.C7_QUANT - SC7.C7_QUJE AS SALDO,
                     SC7.C7_PRECO AS PRECO,
                     SC7.C7_NUMSC AS NUMSC,
                     RTRIM(SC7.C7_OBS) AS OBS,
                     SC7.C7_FORNECE AS FORN,
+                    CASE WHEN C7_RESIDUO <> '' THEN 'RESÍDUO ELIMINADO' WHEN C7_QTDACLA > 0 AND C7_RESIDUO = '' THEN 'PEDIDO USADO EM PRÉ-NOTA' WHEN C7_QUJE = 0 AND C7_QTDACLA = 0 AND 
+                    C7_RESIDUO = '' THEN 'PENDENTE' WHEN C7_QUJE <> 0 AND C7_QUJE < C7_QUANT AND C7_RESIDUO = '' THEN 'ATENDIDO PARCIALMENTE' WHEN C7_QUJE >= C7_QUANT AND 
+                    C7_RESIDUO = '' THEN 'PEDIDO ATENDIDO' ELSE '' END AS LEGENDA,
                     CONCAT(SUBSTRING(SC7.C7_DATPRF,7,2),'/',SUBSTRING(SC7.C7_DATPRF,5,2),'/',SUBSTRING(SC7.C7_DATPRF,1,4)) AS ENTREGA,
                     RTRIM(SA2.A2_NREDUZ) AS DESC_FORN,
                     RTRIM(SA2.A2_CGC) AS CNPJ
@@ -59,6 +69,7 @@ module.exports = {
                     ${grupo_condition}
                     ${finalizado_condition}
                     ${cnpj_condition}
+                    ${legenda_condition}
                     SC7.C7_RESIDUO = '' AND
                     SC7.D_E_L_E_T_ = ''
 
