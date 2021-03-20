@@ -33,7 +33,7 @@ module.exports = {
     if(legenda!=null && legenda) {
       legenda_condition = `CASE WHEN C7_RESIDUO <> '' THEN 'RESÍDUO ELIMINADO' WHEN C7_QTDACLA > 0 AND C7_RESIDUO = '' THEN 'PEDIDO USADO EM PRÉ-NOTA' WHEN C7_QUJE = 0 AND C7_QTDACLA = 0 AND 
       C7_RESIDUO = '' THEN 'PENDENTE' WHEN C7_QUJE <> 0 AND C7_QUJE < C7_QUANT AND C7_RESIDUO = '' THEN 'ATENDIDO PARCIALMENTE' WHEN C7_QUJE >= C7_QUANT AND 
-      C7_RESIDUO = '' THEN 'PEDIDO ATENDIDO' ELSE '' END = ('${legenda}') AND`;
+      C7_RESIDUO = '' THEN 'PEDIDO ATENDIDO' ELSE '' END IN ('${legenda}') AND`;
     } else {legenda_condition = ``;};
            
         // query to the database and get the records
