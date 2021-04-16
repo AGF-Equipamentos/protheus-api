@@ -35,6 +35,7 @@ module.exports = {
                     DESCRICAO,
                     GRUPO,
                     CUSTO,
+                    (CUSTO / QTD_PROD) AS CUSTO_UN,
                     MES,
                     ANO
 
