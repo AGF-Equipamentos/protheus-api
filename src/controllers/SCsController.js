@@ -33,6 +33,7 @@ module.exports = {
                     SC1.C1_UM AS UM,
                     SC1.C1_QUANT AS QTD,
                     SC1.C1_QUJE AS QTD_ENT,
+                    SC1.C1_QUANT - SC1.C1_QUJE AS SALDO,
                     RTRIM(SC1.C1_OBS) AS OBS,
                     CONCAT(SUBSTRING(SC1.C1_DATPRF,7,2),'/',SUBSTRING(SC1.C1_DATPRF,5,2),'/',SUBSTRING(SC1.C1_DATPRF,1,4)) AS ENTREGA,
                     SC1.C1_PEDIDO AS PC,
