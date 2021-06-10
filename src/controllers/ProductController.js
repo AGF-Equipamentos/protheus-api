@@ -27,6 +27,7 @@ module.exports = {
             SELECT  
                     RTRIM(SB1.B1_COD) AS codigo,
                     RTRIM(SB1.B1_DESC) AS descricao,
+                    RTRIM(SB1.B1_ZZLOCA) AS locacao,
                     SB1.B1_GRUPO AS grupo,
                     RTRIM(SBM.BM_DESC) AS desc_grupo
 
