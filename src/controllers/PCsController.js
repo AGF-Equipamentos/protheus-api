@@ -4,7 +4,7 @@ module.exports = {
   async index(req, res) {
     const request = new sql.Request();
 
-    const { filial, pc, produto, grupo, finalizado, cnpj, legenda } = req.query;
+    const { filial, pc, produto, grupo, top, entregue, desc, cnpj, legenda } = req.query;
 
     if(filial!=null) {
       filial_condition = `SC7.C7_FILIAL IN (${filial}) AND`;
@@ -21,14 +21,22 @@ module.exports = {
     if(cnpj!=null) {
       cnpj_condition = `SA2.A2_CGC = ('${cnpj}') AND`;
     } else {cnpj_condition = ``;};
+    
+    if(top!=null) {
+      top_condition = `TOP ${top}`;
+    } else {top_condition = ``;};
+
+    if(desc!=null && desc === 'true') {
+      desc_condition = `SC7.C7_DATPRF DESC, SC7.C7_NUM DESC, SC7.C7_ITEM DESC`;
+    } else {desc_condition = `SC7.C7_DATPRF, SC7.C7_NUM, SC7.C7_ITEM`;};
 
     if(produto!=null) {
       produto_condition = `SC7.C7_PRODUTO IN ('${produto}') AND`;
     } else {produto_condition = ``;};
 
-    if(finalizado!=null && finalizado) {
-      finalizado_condition = `SC7.C7_QUANT <> SC7.C7_QUJE AND`;
-    } else {finalizado_condition = ``;};
+    if(entregue!=null && entregue === 'true') {
+      entregue_condition = `(C7_QUJE > 0) AND`;
+    } else {entregue_condition = ``;};
 
     if(legenda!=null && legenda) {
       legenda_condition = `CASE WHEN C7_RESIDUO <> '' THEN 'RESÍDUO ELIMINADO' WHEN C7_QTDACLA > 0 AND C7_RESIDUO = '' THEN 'PEDIDO USADO EM PRÉ-NOTA' WHEN C7_QUJE = 0 AND C7_QTDACLA = 0 AND 
@@ -39,7 +47,8 @@ module.exports = {
         // query to the database and get the records
         await request.query(
             `
-            SELECT  SC7.C7_NUM AS PEDIDO,	
+            SELECT  ${top_condition}
+                    SC7.C7_NUM AS PEDIDO,	
                     SC7.C7_ITEM AS ITEM,
                     SC7.C7_CONAPRO AS APROVADO,
                     CONCAT(SUBSTRING(SC7.C7_EMISSAO,7,2),'/',SUBSTRING(SC7.C7_EMISSAO,5,2),'/',SUBSTRING(SC7.C7_EMISSAO,1,4)) AS EMISSAO,
@@ -67,13 +76,13 @@ module.exports = {
                     ${filial_condition}
                     ${produto_condition}
                     ${grupo_condition}
-                    ${finalizado_condition}
+                    ${entregue_condition}
                     ${cnpj_condition}
                     ${legenda_condition}
                     SC7.C7_RESIDUO = '' AND
                     SC7.D_E_L_E_T_ = ''
 
-            ORDER BY SC7.C7_DATPRF, SC7.C7_NUM, SC7.C7_ITEM
+            ORDER BY ${desc_condition}
             `, function (err, recordset) {
             
             if (err) console.log(err)
