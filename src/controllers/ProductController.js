@@ -13,7 +13,6 @@ module.exports = {
     if(grupo!=null) {
       grupo_condition = `SB1.B1_GRUPO IN ('${grupo}') AND`;
     } else {grupo_condition = ``;};
-    console.log(grupo_condition)
 
     if(produto!=null) {
       produto_condition = `SB1.B1_COD IN ('${produto}') AND`;
