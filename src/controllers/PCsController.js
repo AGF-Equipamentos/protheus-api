@@ -73,7 +73,7 @@ module.exports = {
             FROM	  SC7010 AS SC7 INNER JOIN
                     SB1010 AS SB1 ON SB1.D_E_L_E_T_ = '' AND SB1.B1_COD = SC7.C7_PRODUTO LEFT OUTER JOIN
                     SA2010 AS SA2 ON SA2.D_E_L_E_T_ = '' AND SA2.A2_FILIAL = LEFT('${filial}', 2) AND SA2.A2_COD = SC7.C7_FORNECE LEFT OUTER JOIN
-                    SD1010 AS SD1 ON SD1.D1_COD = SC7.C7_PRODUTO AND SD1.D1_PEDIDO = SC7.C7_NUM AND SD1.D1_ITEM = SC7.C7_ITEM
+                    SD1010 AS SD1 ON SD1.D1_COD = SC7.C7_PRODUTO AND SD1.D1_PEDIDO = SC7.C7_NUM
 
             WHERE	  ${pc_condition}
                     ${filial_condition}
