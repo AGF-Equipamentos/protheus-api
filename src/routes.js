@@ -12,6 +12,7 @@ const RegisterController = require('./controllers/RegisterController');
 const ProductController = require('./controllers/ProductController');
 const ClientController = require('./controllers/ClientController');
 const FatController = require('./controllers/FatController');
+const AverageController = require('./controllers/AverageController');
 
 routes.get('/estoques', EstoqueController.index);
 routes.get('/pcs', PCsController.index);
@@ -24,5 +25,6 @@ routes.get('/register', RegisterController.index);
 routes.get('/products', ProductController.index);
 routes.get('/clients', ClientController.index);
 routes.get('/fat', FatController.index);
+routes.get('/average', AverageController.index);
 
 module.exports = routes;
