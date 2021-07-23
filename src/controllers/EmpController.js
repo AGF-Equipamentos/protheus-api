@@ -26,6 +26,7 @@ module.exports = {
             SELECT  
                     RTRIM(SD4.D4_COD) AS CODIGO,
                     RTRIM(SB1.B1_DESC) AS DESCRICAO,
+                    RTRIM(SB1.B1_ZZLOCA) AS LOCACAO,
                     SD4.D4_LOCAL AS ARMAZEM,
                     SD4.D4_QTDEORI AS QUANTIDADE,
                     SD4.D4_QUANT AS SALDO,
