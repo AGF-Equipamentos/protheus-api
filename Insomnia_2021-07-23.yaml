@@ -1,0 +1,356 @@
+_type: export
+__export_format: 4
+__export_date: 2021-07-23T15:36:10.078Z
+__export_source: insomnia.desktop.app:v2021.4.1
+resources:
+  - _id: req_bdf24fa1def549d3a0edddb778597d2f
+    parentId: wrk_0c25374761574bf5bca50b541f783f98
+    modified: 1626880257404
+    created: 1621522558099
+    url: "{{ _.base_url }}/emp"
+    name: empenhos
+    description: ""
+    method: GET
+    body: {}
+    parameters:
+      - name: filial
+        value: "0101"
+        description: ""
+        id: pair_3252c3781d0a473989d3cdbfbba887a2
+      - name: produto
+        value: VIXMOT0011
+        description: ""
+        id: pair_6d03acbe4abd4bf9880b4edbbbc19cee
+        disabled: true
+      - id: pair_2f7a1c73a61a4779aa60181af6caba90
+        name: op
+        value: "00769501001"
+        description: ""
+    headers: []
+    authentication: {}
+    metaSortKey: -1621522558099
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: wrk_0c25374761574bf5bca50b541f783f98
+    parentId: null
+    modified: 1618600669275
+    created: 1618600669275
+    name: protheus-api
+    description: ""
+    scope: collection
+    _type: workspace
+  - _id: req_80a9f90413d4446c8d02e1dd4c2df5ac
+    parentId: wrk_0c25374761574bf5bca50b541f783f98
+    modified: 1618602222266
+    created: 1618601673585
+    url: "{{ _.base_url }}/op-costs"
+    name: op-costs
+    description: ""
+    method: GET
+    body: {}
+    parameters:
+      - name: filial
+        value: "0101"
+        description: ""
+        id: pair_1add3d06e3084da7b020ea2cda270f88
+      - name: ano
+        value: 2019,2020,2021
+        description: ""
+        id: pair_793afa41e7e2436aa28464d9d30eb001
+      - name: produto
+        value: MF75P30121
+        description: ""
+        id: pair_286c08b20b5943abac0bd2a3e962a1eb
+    headers: []
+    authentication: {}
+    metaSortKey: -1618601673586
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_f189d355c7e3459f98bb56def3db7439
+    parentId: wrk_0c25374761574bf5bca50b541f783f98
+    modified: 1626098561421
+    created: 1624477628631
+    url: "{{ _.base_url }}/pcs"
+    name: pcs
+    description: ""
+    method: GET
+    body: {}
+    parameters:
+      - name: filial
+        value: "0101"
+        description: ""
+        id: pair_1add3d06e3084da7b020ea2cda270f88
+      - name: legenda
+        value: PEDIDO ATENDIDO', 'ATENDIDO PARCIALMENTE
+        description: ""
+        id: pair_793afa41e7e2436aa28464d9d30eb001
+        disabled: true
+      - name: produto
+        value: MTL1230461
+        description: ""
+        id: pair_286c08b20b5943abac0bd2a3e962a1eb
+        disabled: true
+      - name: top
+        value: "10"
+        description: ""
+        id: pair_e14cbfed1fde4c2899e35aaac7449e0d
+        disabled: true
+      - name: desc
+        value: "true"
+        description: ""
+        id: pair_1ede17070cac40a2a144f3bd13654967
+        disabled: true
+      - id: pair_8bdb6f9298ca42b4b36d989f7e1436e5
+        name: pc
+        value: "025041"
+        description: ""
+    headers: []
+    authentication: {}
+    metaSortKey: -1604094229361.5
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_df5d12ae2a944528b4b7fa6b1b5b8c44
+    parentId: wrk_0c25374761574bf5bca50b541f783f98
+    modified: 1626210904944
+    created: 1626209007611
+    url: "{{ _.base_url }}/inputdocs"
+    name: inputdocs
+    description: ""
+    method: GET
+    body: {}
+    parameters:
+      - name: filial
+        value: "0101"
+        description: ""
+        id: pair_1add3d06e3084da7b020ea2cda270f88
+      - name: produto
+        value: VIXMOT0011
+        description: ""
+        id: pair_286c08b20b5943abac0bd2a3e962a1eb
+        disabled: false
+      - name: top
+        value: "10"
+        description: ""
+        id: pair_e14cbfed1fde4c2899e35aaac7449e0d
+        disabled: false
+      - name: desc
+        value: "true"
+        description: ""
+        id: pair_1ede17070cac40a2a144f3bd13654967
+        disabled: false
+    headers: []
+    authentication: {}
+    metaSortKey: -1600467368305.375
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_7240cf1815684db196e223cfa15a3618
+    parentId: wrk_0c25374761574bf5bca50b541f783f98
+    modified: 1624900987901
+    created: 1624544272687
+    url: "{{ _.base_url }}/products"
+    name: products
+    description: ""
+    method: GET
+    body: {}
+    parameters:
+      - name: filial
+        value: "01"
+        description: ""
+        id: pair_1add3d06e3084da7b020ea2cda270f88
+      - name: grupo
+        value: 0010','0020','0030','0040','0050','0060','0070','0080','0090','0091','0092','0093','0094','0095','0097','0110','0120','0130','0200','0201','0202','0203','0204','0300','0301','0350','0360','0370','0375','0380','0390','0400','0401','0490','0500','0501','0502','0503','0510','0520','0530','0540','0550','0560','0570',
+          '9999
+        description: ""
+        id: pair_1ede17070cac40a2a144f3bd13654967
+    headers: []
+    authentication: {}
+    metaSortKey: -1596840507249.25
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_15407de76367474286eabcf11c3c2e43
+    parentId: wrk_0c25374761574bf5bca50b541f783f98
+    modified: 1624991778204
+    created: 1624991743585
+    url: "{{ _.base_url }}/register"
+    name: register
+    description: ""
+    method: GET
+    body: {}
+    parameters:
+      - name: filial
+        value: "0101"
+        description: ""
+        id: pair_1add3d06e3084da7b020ea2cda270f88
+      - name: grupo
+        value: 0010','0020','0030','0040','0050','0060','0070','0080','0090','0091','0092','0093','0094','0095','0097','0110','0120','0130','0200','0201','0202','0203','0204','0300','0301','0350','0360','0370','0375','0380','0390','0400','0401','0490','0500','0501','0502','0503','0510','0520','0530','0540','0550','0560','0570',
+          '9999
+        description: ""
+        id: pair_1ede17070cac40a2a144f3bd13654967
+        disabled: true
+      - name: produto
+        value: VIXMOT0011
+        description: ""
+        id: pair_2f3f8b4014864c82850193c12a2de163
+    headers: []
+    authentication: {}
+    metaSortKey: -1595027076721.1875
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_c3d8a79402ab42c4b9cf7f2d2384184c
+    parentId: wrk_0c25374761574bf5bca50b541f783f98
+    modified: 1624901515499
+    created: 1624900995676
+    url: "{{ _.base_url }}/ops"
+    name: ops
+    description: ""
+    method: GET
+    body: {}
+    parameters:
+      - name: filial
+        value: "0101"
+        description: ""
+        id: pair_1add3d06e3084da7b020ea2cda270f88
+        disabled: false
+      - name: opnumber
+        value: "00768301001"
+        description: ""
+        id: pair_1ede17070cac40a2a144f3bd13654967
+        disabled: false
+    headers: []
+    authentication: {}
+    metaSortKey: -1593213646193.125
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_ca55c7dd53a6404cbceda42b96e84424
+    parentId: wrk_0c25374761574bf5bca50b541f783f98
+    modified: 1626694960708
+    created: 1625165333368
+    url: "{{ _.base_url }}/average"
+    name: average
+    description: ""
+    method: GET
+    body: {}
+    parameters:
+      - name: filial
+        value: "0101"
+        description: ""
+        id: pair_1add3d06e3084da7b020ea2cda270f88
+        disabled: false
+      - name: produto
+        value: VIXMOT0011
+        description: ""
+        id: pair_1ede17070cac40a2a144f3bd13654967
+        disabled: false
+        type: text
+        multiline: false
+    headers: []
+    authentication: {}
+    metaSortKey: -1591400215665.0625
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: env_f326942f60ba9229f18db60b8fab1d8fc0f39c50
+    parentId: wrk_0c25374761574bf5bca50b541f783f98
+    modified: 1618600669357
+    created: 1618600669357
+    name: Base Environment
+    data: {}
+    dataPropertyOrder: null
+    color: null
+    isPrivate: false
+    metaSortKey: 1618600669357
+    _type: environment
+  - _id: jar_f326942f60ba9229f18db60b8fab1d8fc0f39c50
+    parentId: wrk_0c25374761574bf5bca50b541f783f98
+    modified: 1618600669359
+    created: 1618600669359
+    name: Default Jar
+    cookies: []
+    _type: cookie_jar
+  - _id: spc_d006e876408344f38d8254461ddd4faf
+    parentId: wrk_0c25374761574bf5bca50b541f783f98
+    modified: 1618600669279
+    created: 1618600669279
+    fileName: protheus-api
+    contents: ""
+    contentType: yaml
+    _type: api_spec
+  - _id: env_541a2cef9f9f45d8952afb881278a9e2
+    parentId: env_f326942f60ba9229f18db60b8fab1d8fc0f39c50
+    modified: 1618601885679
+    created: 1618601858794
+    name: dev
+    data:
+      base_url: http://localhost:3333
+      token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE1OTAxNTExNzQsImV4cCI6MTU5MDIzNzU3NCwic3ViIjoiNGMyZTVjNjAtNWIyZS00ODk5LTkxYjktMzQ2Y2U0NDAzZTBkIn0.dkhCboeExTy1JB43C16hD5OSILz3rQg4hvZeTknoMmk
+    dataPropertyOrder:
+      "&":
+        - base_url
+        - token
+    color: "#32e10e"
+    isPrivate: false
+    metaSortKey: 1618601858794
+    _type: environment
+  - _id: env_6bd67bd6fae64ef9b42741793b35fcc3
+    parentId: env_f326942f60ba9229f18db60b8fab1d8fc0f39c50
+    modified: 1624544329370
+    created: 1624544307811
+    name: prod
+    data:
+      base_url: https://api.agfequipamentos.com.br
+      token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE1OTAxNTExNzQsImV4cCI6MTU5MDIzNzU3NCwic3ViIjoiNGMyZTVjNjAtNWIyZS00ODk5LTkxYjktMzQ2Y2U0NDAzZTBkIn0.dkhCboeExTy1JB43C16hD5OSILz3rQg4hvZeTknoMmk
+    dataPropertyOrder:
+      "&":
+        - base_url
+        - token
+    color: "#780ee1"
+    isPrivate: false
+    metaSortKey: 1624544307811
+    _type: environment

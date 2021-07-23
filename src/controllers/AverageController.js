@@ -5,7 +5,7 @@ module.exports = {
     const request = new sql.Request();
 
     const { filial, produto } = req.query;
-
+    
     if(filial!=null) {
       filial_condition = `SB3.B3_FILIAL IN ('${filial}') AND`;
     } else {filial_condition = ``;};
