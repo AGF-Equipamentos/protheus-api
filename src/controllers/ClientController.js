@@ -4,12 +4,17 @@ module.exports = {
   async index(req, res) {
     const request = new sql.Request();
            
-    //CONCAT(SUBSTRING(SC2.C2_DATPRI,7,2),'/',SUBSTRING(SC2.C2_DATPRI,5,2),'/',SUBSTRING(SC2.C2_DATPRI,1,4)) AS ENTREGA
+    const { filial } = req.query;
+    
+    if(filial!=null) {
+      filial_condition = `SA1.A1_FILIAL IN ('${filial}') AND`;
+    } else {filial_condition = ``;};
 
         // query to the database and get the records
         await request.query(
             `
             SELECT
+                    RTRIM(SA1.A1_FILIAL) AS filial,
                     RTRIM(SA1.A1_COD) AS codigo_cliente,
                     RTRIM(SA1.A1_NOME) AS razao_social,
                     RTRIM(SA1.A1_CGC) AS cnpj,
@@ -27,6 +32,7 @@ module.exports = {
             FROM    SA1010 AS SA1
 
             WHERE	  
+                    ${filial_condition}
                     SA1.A1_MSBLQL <> 1 AND
                     SA1.D_E_L_E_T_ = ''
 
