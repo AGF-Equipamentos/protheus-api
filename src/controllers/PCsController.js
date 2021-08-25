@@ -70,7 +70,7 @@ module.exports = {
                     RTRIM(SA2.A2_CGC) AS CNPJ
 
             FROM	  SC7010 AS SC7 INNER JOIN
-                    SB1010 AS SB1 ON SB1.D_E_L_E_T_ = '' AND SB1.B1_COD = SC7.C7_PRODUTO LEFT OUTER JOIN
+                    SB1010 AS SB1 ON SB1.D_E_L_E_T_ = '' AND SB1.B1_FILIAL = LEFT('${filial}', 2) AND SB1.B1_COD = SC7.C7_PRODUTO LEFT OUTER JOIN
                     SA2010 AS SA2 ON SA2.D_E_L_E_T_ = '' AND SA2.A2_FILIAL = LEFT('${filial}', 2) AND SA2.A2_COD = SC7.C7_FORNECE
 
             WHERE	  ${pc_condition}
