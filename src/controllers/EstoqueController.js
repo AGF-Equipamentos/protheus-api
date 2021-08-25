@@ -28,7 +28,7 @@ module.exports = {
         await request.query(
             `
             SELECT FILIAL,PRODUTO,SALDO,ARMAZEM
-            FROM SALDO_ESTOQUE 
+            FROM SALDO_ESTOQUE WITH (NOLOCK)
             WHERE
             ${produto_condition}
             ${grupo_condition}

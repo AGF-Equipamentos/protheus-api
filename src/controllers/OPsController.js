@@ -61,8 +61,8 @@ module.exports = {
                     CONCAT(SUBSTRING(SC2.C2_EMISSAO,7,2),'/',SUBSTRING(SC2.C2_EMISSAO,5,2),'/',SUBSTRING(SC2.C2_EMISSAO,1,4)) AS DAT_EMI,
                     SC2.C2_QUJE AS QTD_PRO
 
-            FROM    SC2010 AS SC2 LEFT OUTER JOIN
-                    SB1010 AS SB1 ON SB1.D_E_L_E_T_ = '' AND SB1.B1_COD = SC2.C2_PRODUTO
+            FROM    SC2010 AS SC2 WITH (NOLOCK) LEFT OUTER JOIN
+                    SB1010 AS SB1 WITH (NOLOCK) ON SB1.D_E_L_E_T_ = '' AND SB1.B1_COD = SC2.C2_PRODUTO
 
             WHERE   ${filial_condition}
                     ${produto_condition}

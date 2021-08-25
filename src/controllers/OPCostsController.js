@@ -39,7 +39,7 @@ module.exports = {
                     MES,
                     ANO
 
-            FROM    OP
+            FROM    OP WITH (NOLOCK)
 
             WHERE   ${filial_condition}
                     ${grupo_condition}

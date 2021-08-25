@@ -44,7 +44,7 @@ module.exports = {
                     MARGEM,
                     D2_QUANT AS QTD
 
-            FROM    FATURAMENTO
+            FROM    FATURAMENTO WITH (NOLOCK)
 
             WHERE   ${filial_condition}
                     ${produto_condition}

@@ -29,7 +29,7 @@ module.exports = {
                     RTRIM(SA1.A1_EMAIL) AS email,
                     RTRIM(SA1.A1_TEL) AS telefone
 
-            FROM    SA1010 AS SA1
+            FROM    SA1010 AS SA1 WITH (NOLOCK) 
 
             WHERE	  
                     ${filial_condition}
