@@ -15,7 +15,7 @@ module.exports = {
     } else {produto_condition = ``;};
 
     if(grupo!=null) {
-      grupo_condition = `B1_GRUPO IN (${grupo}) AND`;
+      grupo_condition = `B1_GRUPO IN ('${grupo}') AND`;
     } else {grupo_condition = ``;};
 
     if(ano!=null) {
