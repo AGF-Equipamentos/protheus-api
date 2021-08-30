@@ -16,7 +16,7 @@ module.exports = {
     } else {produto_condition = ``;};
 
     if(grupo!=null) {
-      grupo_condition = `GRUPO IN (${grupo}) AND`;
+      grupo_condition = `GRUPO IN ('${grupo}') AND`;
     } else {grupo_condition = ``;};
 
     if(armazem!=null) {
