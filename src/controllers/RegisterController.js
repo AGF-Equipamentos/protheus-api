@@ -31,6 +31,7 @@ module.exports = {
                     RTRIM(SB1.B1_COD) AS CODIGO,
                     RTRIM(SB1.B1_DESC) AS DESCRICAO,
                     RTRIM(SB1.B1_ZZLOCA) AS LOCACAO,
+                    SB1.B1_GRUPO AS GRUPO,
                     SB1.B1_EMIN AS PP,
                     SB1.B1_LE AS LE,
                     SB1.B1_UM AS UM,
