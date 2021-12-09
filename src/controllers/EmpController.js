@@ -25,14 +25,14 @@ module.exports = {
     if (kanban === 'true') {
       kanban_condition = `SB1.B1_ZZKANBA = 'S' AND`;
     } else if (kanban === 'false') {
-      kanban_condition = `SB1.B1_ZZKANBA <> 'S' AND`;
+      kanban_condition = `(SB1.B1_ZZKANBA = 'N') AND`;
     } else {kanban_condition = ``;};
 
     if (supermercado === 'true') {
       supermercado_condition = `SB1.B1_APROPRI = 'I' AND`;
     } else if (supermercado === 'false') {
       supermercado_condition = `SB1.B1_APROPRI <> 'I' AND`;
-    } else {supermercado_condition = ``;};    
+    } else {supermercado_condition = ``;};
     //CONCAT(SUBSTRING(SC2.C2_DATPRI,7,2),'/',SUBSTRING(SC2.C2_DATPRI,5,2),'/',SUBSTRING(SC2.C2_DATPRI,1,4)) AS ENTREGA
 
         // query to the database and get the records
