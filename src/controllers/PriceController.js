@@ -1,3 +1,4 @@
+const { randomUUID } = require("crypto")
 const sql = require("mssql");
 
 module.exports = {
@@ -38,6 +39,7 @@ module.exports = {
 
             return res.json(recordset.recordsets[0].map(priceItem => ({
               ...priceItem,
+              id: randomUUID(),
               formatted_price: 
                 new Intl.NumberFormat('pt-BR', { 
                   style: 'currency', 
