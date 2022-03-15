@@ -1,5 +1,5 @@
-const { randomUUID } = require("crypto")
 const sql = require("mssql");
+const crypto = require("crypto");
 
 module.exports = {
   async index(req, res) {
@@ -39,7 +39,7 @@ module.exports = {
 
             return res.json(recordset.recordsets[0].map(priceItem => ({
               ...priceItem,
-              id: randomUUID(),
+              id: crypto.randomUUID(),
               formatted_price: 
                 new Intl.NumberFormat('pt-BR', { 
                   style: 'currency', 
