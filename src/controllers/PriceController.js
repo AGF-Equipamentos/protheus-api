@@ -5,9 +5,15 @@ module.exports = {
   async index(req, res) {
     const request = new sql.Request();
 
-    const { branch, part_number, table_pn, budget_items } = req.query;
+    const { branch, part_number, table_pn, quantity, budget_items } = req.query;
     console.log(budget_items)
     console.log(typeof budget_items)
+    console.log(budget_items.split('\r\n').map(item => {
+      const itemSplitted = item.split(';')
+      return {
+        part_number: itemSplitted[0],
+        qty: itemSplitted[1]
+      }}))
 
     if(branch!=null) {
       branch_condition = `DA1.DA1_FILIAL IN ('${filial.slice(0,2)}') AND`;
@@ -43,6 +49,10 @@ module.exports = {
               ...priceItem,
               id: randomUUID(),
               budget_items: budget_items,
+              total: new Intl.NumberFormat('pt-BR', { 
+                style: 'currency', 
+                currency: 'BRL' 
+              }).format(quantity * priceItem.price),
               formatted_price: 
                 new Intl.NumberFormat('pt-BR', { 
                   style: 'currency', 
