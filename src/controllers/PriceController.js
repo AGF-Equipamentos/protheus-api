@@ -5,7 +5,9 @@ module.exports = {
   async index(req, res) {
     const request = new sql.Request();
 
-    const { branch, part_number, table_pn } = req.query;
+    const { branch, part_number, table_pn, budget_items } = req.query;
+    console.log(budget_items)
+    console.log(typeof budget_items)
 
     if(branch!=null) {
       branch_condition = `DA1.DA1_FILIAL IN ('${filial.slice(0,2)}') AND`;
@@ -40,6 +42,7 @@ module.exports = {
             return res.json(recordset.recordsets[0].map(priceItem => ({
               ...priceItem,
               id: randomUUID(),
+              budget_items: budget_items,
               formatted_price: 
                 new Intl.NumberFormat('pt-BR', { 
                   style: 'currency', 
