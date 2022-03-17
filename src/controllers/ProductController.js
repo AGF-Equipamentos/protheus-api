@@ -1,29 +1,39 @@
-const sql = require("mssql");
+const sql = require('mssql')
 
 module.exports = {
   async index(req, res) {
-    const request = new sql.Request();
+    const request = new sql.Request()
 
-    const { filial, grupo, produto } = req.query;
+    const { filial, grupo, produto } = req.query
 
-    if(filial!=null) {
-      filial_condition = `SB1.B1_FILIAL IN (${filial}) AND`;
-    } else {filial_condition = ``;};
+    let filial_condition
+    let grupo_condition
+    let produto_condition
 
-    if(grupo!=null) {
-      grupo_condition = `SB1.B1_GRUPO IN ('${grupo}') AND`;
-    } else {grupo_condition = ``;};
+    if (filial != null) {
+      filial_condition = `SB1.B1_FILIAL IN (${filial}) AND`
+    } else {
+      filial_condition = ``
+    }
 
-    if(produto!=null) {
-      produto_condition = `SB1.B1_COD IN ('${produto}') AND`;
-    } else {produto_condition = ``;};
-           
+    if (grupo != null) {
+      grupo_condition = `SB1.B1_GRUPO IN ('${grupo}') AND`
+    } else {
+      grupo_condition = ``
+    }
+
+    if (produto != null) {
+      produto_condition = `SB1.B1_COD IN ('${produto}') AND`
+    } else {
+      produto_condition = ``
+    }
+
     //CONCAT(SUBSTRING(SC2.C2_DATPRI,7,2),'/',SUBSTRING(SC2.C2_DATPRI,5,2),'/',SUBSTRING(SC2.C2_DATPRI,1,4)) AS ENTREGA
 
-        // query to the database and get the records
-        await request.query(
-            `
-            SELECT  
+    // query to the database and get the records
+    await request.query(
+      `
+            SELECT
                     RTRIM(SB1.B1_COD) AS codigo,
                     RTRIM(SB1.B1_DESC) AS descricao,
                     RTRIM(SB1.B1_ZZLOCA) AS locacao,
@@ -39,16 +49,16 @@ module.exports = {
                     ${produto_condition}
                 	  SB1.B1_MSBLQL = '2' AND
                     SB1.D_E_L_E_T_ = ''
-            
+
             ORDER BY grupo
 
-            `, function (err, recordset) {
-            
-            if (err) console.log(err)
+            `,
+      function (err, recordset) {
+        if (err) console.log(err)
 
-            return res.json(recordset.recordsets[0]);
-            // send records as a response
-            }
-        )
+        return res.json(recordset.recordsets[0])
+        // send records as a response
+      }
+    )
   }
-};
+}

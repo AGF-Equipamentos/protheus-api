@@ -8,7 +8,9 @@
   "scripts": {
     "dev:server": "nodemon src/server.js",
     "serve": "pm2 start ecosystem.config.js",
-    "servedev": "pm2 start src/server.js --watch"
+    "servedev": "pm2 start src/server.js --watch",
+    "lint": "eslint src --fix --max-warnings=0",
+    "test": "jest"
   },
   "dependencies": {
     "cors": "^2.8.5",
@@ -17,7 +19,12 @@
     "mssql": "^5.1.0"
   },
   "devDependencies": {
+    "eslint": "^8.11.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.0.0",
     "forever": "^1.0.0",
-    "nodemon": "^1.19.4"
+    "jest": "^27.5.1",
+    "nodemon": "^1.19.4",
+    "prettier": "2.6.0"
   }
 }

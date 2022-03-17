@@ -1,18 +1,22 @@
-const sql = require("mssql");
+const sql = require('mssql')
 
 module.exports = {
   async index(req, res) {
-    const request = new sql.Request();
-           
-    const { filial } = req.query;
-    
-    if(filial!=null) {
-      filial_condition = `SA1.A1_FILIAL IN ('${filial}') AND`;
-    } else {filial_condition = ``;};
+    const request = new sql.Request()
 
-        // query to the database and get the records
-        await request.query(
-            `
+    const { filial } = req.query
+
+    let filial_condition
+
+    if (filial != null) {
+      filial_condition = `SA1.A1_FILIAL IN ('${filial}') AND`
+    } else {
+      filial_condition = ``
+    }
+
+    // query to the database and get the records
+    await request.query(
+      `
             SELECT
                     RTRIM(SA1.A1_FILIAL) AS filial,
                     RTRIM(SA1.A1_COD) AS codigo_cliente,
@@ -29,20 +33,20 @@ module.exports = {
                     RTRIM(SA1.A1_EMAIL) AS email,
                     RTRIM(SA1.A1_TEL) AS telefone
 
-            FROM    SA1010 AS SA1 WITH (NOLOCK) 
+            FROM    SA1010 AS SA1 WITH (NOLOCK)
 
-            WHERE	  
+            WHERE
                     ${filial_condition}
                     SA1.A1_MSBLQL <> 1 AND
                     SA1.D_E_L_E_T_ = ''
 
-            `, function (err, recordset) {
-            
-            if (err) console.log(err)
+            `,
+      function (err, recordset) {
+        if (err) console.log(err)
 
-            return res.json(recordset.recordsets[0]);
-            // send records as a response
-            }
-        )
+        return res.json(recordset.recordsets[0])
+        // send records as a response
+      }
+    )
   }
-};
+}

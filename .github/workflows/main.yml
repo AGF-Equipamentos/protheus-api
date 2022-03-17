@@ -18,7 +18,13 @@ jobs:
 
     - name: install dependencies
       run: yarn
-      
+
+    - name: Runnig linter
+      run: yarn lint
+
+    - name: Runnig tests
+      run: yarn test
+
     - name: Copy project to AGF
       uses: appleboy/scp-action@master
       with:

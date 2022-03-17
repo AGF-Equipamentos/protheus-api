@@ -1,22 +1,29 @@
-const sql = require("mssql");
+const sql = require('mssql')
 
 module.exports = {
   async index(req, res) {
-    const request = new sql.Request();
+    const request = new sql.Request()
 
-    const { filial, produto } = req.query;
-    
-    if(filial!=null) {
-      filial_condition = `SB3.B3_FILIAL IN ('${filial}') AND`;
-    } else {filial_condition = ``;};
+    const { filial, produto } = req.query
 
-    if(produto!=null) {
-      produto_condition = `SB3.B3_COD IN ('${produto}') AND`;
-    } else {produto_condition = ``;};
-           
-        // query to the database and get the records
-        await request.query(
-            `
+    let filial_condition
+    let produto_condition
+
+    if (filial != null) {
+      filial_condition = `SB3.B3_FILIAL IN ('${filial}') AND`
+    } else {
+      filial_condition = ``
+    }
+
+    if (produto != null) {
+      produto_condition = `SB3.B3_COD IN ('${produto}') AND`
+    } else {
+      produto_condition = ``
+    }
+
+    // query to the database and get the records
+    await request.query(
+      `
             SELECT
                     RTRIM(SB3.B3_COD) AS CODIGO,
                     SB3.B3_Q01 AS Q01,
@@ -32,20 +39,20 @@ module.exports = {
                     SB3.B3_Q11 AS Q11,
                     SB3.B3_Q12 AS Q12
 
-            FROM	  SB3010 AS SB3 WITH (NOLOCK) 
+            FROM	  SB3010 AS SB3 WITH (NOLOCK)
 
-            WHERE	  
+            WHERE
                     ${produto_condition}
                     ${filial_condition}
                     SB3.D_E_L_E_T_ = ''
 
-            `, function (err, recordset) {
-            
-            if (err) console.log(err)
+            `,
+      function (err, recordset) {
+        if (err) console.log(err)
 
-            return res.json(recordset.recordsets[0]);
-            // send records as a response
-            }
-        )
+        return res.json(recordset.recordsets[0])
+        // send records as a response
+      }
+    )
   }
-};
+}

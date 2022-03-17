@@ -1,32 +1,45 @@
-const sql = require("mssql");
+const sql = require('mssql')
 
 module.exports = {
   async index(req, res) {
-    const request = new sql.Request();
+    const request = new sql.Request()
 
-    const { filial, produto, top, desc } = req.query;
+    const { filial, produto, top, desc } = req.query
 
-    if(filial!=null) {
-      filial_condition = `SD1.D1_FILIAL IN (${filial}) AND`;
-    } else {filial_condition = ``;};
-    
-    if(top!=null) {
-      top_condition = `TOP ${top}`;
-    } else {top_condition = ``;};
+    let filial_condition
+    let produto_condition
+    let top_condition
+    let desc_condition
 
-    if(desc!=null && desc === 'true') {
-      desc_condition = `SD1.D1_DTDIGIT DESC`;
-    } else {desc_condition = `SD1.D1_DTDIGIT`;};
+    if (filial != null) {
+      filial_condition = `SD1.D1_FILIAL IN (${filial}) AND`
+    } else {
+      filial_condition = ``
+    }
 
-    if(produto!=null) {
-      produto_condition = `SD1.D1_COD IN ('${produto}') AND`;
-    } else {produto_condition = ``;};
-           
-        // query to the database and get the records
-        await request.query(
-            `
+    if (top != null) {
+      top_condition = `TOP ${top}`
+    } else {
+      top_condition = ``
+    }
+
+    if (desc != null && desc === 'true') {
+      desc_condition = `SD1.D1_DTDIGIT DESC`
+    } else {
+      desc_condition = `SD1.D1_DTDIGIT`
+    }
+
+    if (produto != null) {
+      produto_condition = `SD1.D1_COD IN ('${produto}') AND`
+    } else {
+      produto_condition = ``
+    }
+
+    // query to the database and get the records
+    await request.query(
+      `
             SELECT  ${top_condition}
-                    SD1.D1_PEDIDO AS PEDIDO,	
+                    SD1.D1_PEDIDO AS PEDIDO,
                     SD1.D1_QUANT AS QTD,
                     SD1.D1_VUNIT AS PRECO,
                     CONCAT(SUBSTRING(SD1.D1_DTDIGIT,7,2),'/',SUBSTRING(SD1.D1_DTDIGIT,5,2),'/',SUBSTRING(SD1.D1_DTDIGIT,1,4)) AS ENTREGUE,
@@ -41,13 +54,13 @@ module.exports = {
                     SD1.D_E_L_E_T_ = ''
 
             ORDER BY ${desc_condition}
-            `, function (err, recordset) {
-            
-            if (err) console.log(err)
+            `,
+      function (err, recordset) {
+        if (err) console.log(err)
 
-            return res.json(recordset.recordsets[0]);
-            // send records as a response
-            }
-        )
+        return res.json(recordset.recordsets[0])
+        // send records as a response
+      }
+    )
   }
-};
+}

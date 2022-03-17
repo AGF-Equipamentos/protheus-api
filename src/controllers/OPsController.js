@@ -1,52 +1,74 @@
-const sql = require("mssql");
+const sql = require('mssql')
 
 module.exports = {
   async index(req, res) {
-    const request = new sql.Request();
+    const request = new sql.Request()
 
-    const { filial, obs, produto, opnumber, fechado, ano, mes } = req.query;
+    const { filial, obs, produto, opnumber, fechado, ano, mes } = req.query
 
-    if(produto!=null) {
-      produto_condition = `SC2.C2_PRODUTO IN ('${produto}') AND`;
-    } else {produto_condition = ``;};
+    let produto_condition
+    let filial_condition
+    let obs_condition
+    let opnumber_condition
+    let fechado_condition
+    let mes_condition
+    let ano_condition
 
-    if(filial!=null) {
-      filial_condition = `SC2.C2_FILIAL IN (${filial}) AND`;
-    } else {filial_condition = ``;};
+    if (produto != null) {
+      produto_condition = `SC2.C2_PRODUTO IN ('${produto}') AND`
+    } else {
+      produto_condition = ``
+    }
 
-    if(obs!=null) {
-      obs_condition = `(SC2.C2_OBS LIKE '%${obs}%') AND`;
-    } else {obs_condition = ``;};
+    if (filial != null) {
+      filial_condition = `SC2.C2_FILIAL IN (${filial}) AND`
+    } else {
+      filial_condition = ``
+    }
 
-    if(fechado!=null && fechado === 'true') {
-      fechado_condition = `SC2.C2_DATRF <> '' AND`;
-    } else if (fechado!=null && fechado === 'false') {
-      fechado_condition = `SC2.C2_DATRF = '' AND`;
-    } else {fechado_condition = ``;};
+    if (obs != null) {
+      obs_condition = `(SC2.C2_OBS LIKE '%${obs}%') AND`
+    } else {
+      obs_condition = ``
+    }
 
-    if(opnumber!=null) {
+    if (fechado != null && fechado === 'true') {
+      fechado_condition = `SC2.C2_DATRF <> '' AND`
+    } else if (fechado != null && fechado === 'false') {
+      fechado_condition = `SC2.C2_DATRF = '' AND`
+    } else {
+      fechado_condition = ``
+    }
+
+    if (opnumber != null) {
       opnumber_condition = `
-      (SC2.C2_NUM = '${opnumber.slice(0,6)}') AND
-      (SC2.C2_ITEM = '${opnumber.slice(6,8)}') AND
-      (SC2.C2_SEQUEN = '${opnumber.slice(8,11)}') AND
-      `;
-    } else {opnumber_condition = ``;};
+      (SC2.C2_NUM = '${opnumber.slice(0, 6)}') AND
+      (SC2.C2_ITEM = '${opnumber.slice(6, 8)}') AND
+      (SC2.C2_SEQUEN = '${opnumber.slice(8, 11)}') AND
+      `
+    } else {
+      opnumber_condition = ``
+    }
 
-    if(mes!=null) {
+    if (mes != null) {
       mes_condition = `
       (SUBSTRING(SC2.C2_DATRF,5,2) = '${mes}') AND
-      `;
-    } else {mes_condition = ``;};
+      `
+    } else {
+      mes_condition = ``
+    }
 
-    if(ano!=null) {
+    if (ano != null) {
       ano_condition = `
       (SUBSTRING(SC2.C2_DATRF,1,4) = '${ano}') AND
-      `;
-    } else {ano_condition = ``;};
-           
-        // query to the database and get the records
-        await request.query(
-            `
+      `
+    } else {
+      ano_condition = ``
+    }
+
+    // query to the database and get the records
+    await request.query(
+      `
             SELECT  RTRIM(SC2.C2_PRODUTO) AS PRODUTO,
                     RTRIM(SB1.B1_DESC) AS DESCRICAO,
                     SC2.C2_NUM + SC2.C2_ITEM + SC2.C2_SEQUEN AS OP,
@@ -74,13 +96,13 @@ module.exports = {
                     (SC2.D_E_L_E_T_ = '')
 
             ORDER BY SC2.C2_DATPRI
-            `, function (err, recordset) {
-            
-            if (err) console.log(err)
-             
-            return res.json(recordset.recordsets[0]);
-            // send records as a response
-            }
-        )
+            `,
+      function (err, recordset) {
+        if (err) console.log(err)
+
+        return res.json(recordset.recordsets[0])
+        // send records as a response
+      }
+    )
   }
-};
+}
