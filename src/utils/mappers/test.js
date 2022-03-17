@@ -1,6 +1,9 @@
 const { singleProductPriceMapper, multiProductPriceMapper } = require('.')
 
 describe('singleProductPriceMapper()', () => {
+  it.todo('should return an warning when the part number does not exists')
+  it.todo('should return an warning when the products is out of stock')
+
   it('should return a product with the price formatted', () => {
     const productFormatted = singleProductPriceMapper(
       [
@@ -33,6 +36,9 @@ describe('singleProductPriceMapper()', () => {
 })
 
 describe('multiProductPriceMapper', () => {
+  it.todo('should return an warning when the part number does not exists')
+  it.todo('should return an warning when the products is out of stock')
+
   it('should return the products with price formatted', () => {
     const productsFormatted = multiProductPriceMapper(
       [
