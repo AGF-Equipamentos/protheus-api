@@ -55,7 +55,7 @@ module.exports = {
                     MES,
                     ANO
 
-            FROM    OP WITH (NOLOCK)
+            FROM    OP WITH (READPAST)
 
             WHERE   ${filial_condition}
                     ${grupo_condition}

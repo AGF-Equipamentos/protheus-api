@@ -98,9 +98,9 @@ module.exports = {
                     RTRIM(SA2.A2_NREDUZ) AS DESC_FORN,
                     RTRIM(SA2.A2_CGC) AS CNPJ
 
-            FROM	  SC7010 AS SC7 WITH (NOLOCK) INNER JOIN
-                    SB1010 AS SB1 WITH (NOLOCK) ON SB1.D_E_L_E_T_ = '' AND SB1.B1_FILIAL = LEFT('${filial}', 2) AND SB1.B1_COD = SC7.C7_PRODUTO LEFT OUTER JOIN
-                    SA2010 AS SA2 WITH (NOLOCK) ON SA2.D_E_L_E_T_ = '' AND SA2.A2_FILIAL = LEFT('${filial}', 2) AND SA2.A2_COD = SC7.C7_FORNECE  AND SC7.C7_LOJA = SA2.A2_LOJA
+            FROM	  SC7010 AS SC7 WITH (READPAST) INNER JOIN
+                    SB1010 AS SB1 WITH (READPAST) ON SB1.D_E_L_E_T_ = '' AND SB1.B1_FILIAL = LEFT('${filial}', 2) AND SB1.B1_COD = SC7.C7_PRODUTO LEFT OUTER JOIN
+                    SA2010 AS SA2 WITH (READPAST) ON SA2.D_E_L_E_T_ = '' AND SA2.A2_FILIAL = LEFT('${filial}', 2) AND SA2.A2_COD = SC7.C7_FORNECE  AND SC7.C7_LOJA = SA2.A2_LOJA
 
             WHERE	  ${pc_condition}
                     ${filial_condition}

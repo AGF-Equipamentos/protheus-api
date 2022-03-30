@@ -39,7 +39,7 @@ module.exports = {
                     SB3.B3_Q11 AS Q11,
                     SB3.B3_Q12 AS Q12
 
-            FROM	  SB3010 AS SB3 WITH (NOLOCK)
+            FROM	  SB3010 AS SB3 WITH (READPAST)
 
             WHERE
                     ${produto_condition}

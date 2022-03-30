@@ -31,7 +31,7 @@ module.exports = {
                     RTRIM(SG1.G1_COMP) AS COMPONENTE,
                     SG1.G1_QUANT AS QUANTIDADE
 
-            FROM	  SG1010 AS SG1 WITH (NOLOCK)
+            FROM	  SG1010 AS SG1 WITH (READPAST)
 
             WHERE	  ${filial_condition}
                     ${produto_condition}

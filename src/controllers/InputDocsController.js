@@ -45,13 +45,17 @@ module.exports = {
                     CONCAT(SUBSTRING(SD1.D1_DTDIGIT,7,2),'/',SUBSTRING(SD1.D1_DTDIGIT,5,2),'/',SUBSTRING(SD1.D1_DTDIGIT,1,4)) AS ENTREGUE,
                     RTRIM(SA2.A2_NREDUZ) AS DESC_FORN
 
-            FROM	  SD1010 AS SD1 WITH (NOLOCK) INNER JOIN
-                    SA2010 AS SA2 WITH (NOLOCK) ON SA2.D_E_L_E_T_ = '' AND SA2.A2_FILIAL = LEFT('${filial}', 2) AND SA2.A2_COD = SD1.D1_FORNECE
+            FROM	  SD1010 AS SD1 WITH (READPAST) LEFT OUTER JOIN
+                    SF1010 AS SF1 WITH (READPAST) ON SD1.D1_LOJA = SF1.F1_LOJA AND SD1.D1_FORNECE = SF1.F1_FORNECE AND SD1.D1_FILIAL = SF1.F1_FILIAL AND SD1.D1_DOC = SF1.F1_DOC AND SD1.D1_SERIE = SF1.F1_SERIE LEFT OUTER JOIN
+                    SA2010 AS SA2 WITH (READPAST) ON SA2.D_E_L_E_T_ = '' AND SA2.A2_FILIAL = LEFT('${filial}', 2) AND SA2.A2_COD = SD1.D1_FORNECE
 
             WHERE
                     ${filial_condition}
                     ${produto_condition}
-                    SD1.D_E_L_E_T_ = ''
+                    SF1.F1_TIPO <> 'B' AND
+                    SD1.D_E_L_E_T_ = '' AND
+                    SF1.D_E_L_E_T_ = '' AND
+                    SA2.D_E_L_E_T_ = ''
 
             ORDER BY ${desc_condition}
             `,
