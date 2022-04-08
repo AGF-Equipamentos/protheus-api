@@ -18,6 +18,12 @@ jobs:
 
     - name: install dependencies
       run: yarn
+      env:
+        PROTHEUS_USER: ${{ secrets.PROTHEUS_USER }}
+        PROTHEUS_PASSWORD: ${{ secrets.PROTHEUS_PASSWORD }}
+        PROTHEUS_SERVER: ${{ secrets.PROTHEUS_SERVER }}
+        PROTHEUS_DATABASE: ${{ secrets.PROTHEUS_DATABASE }}
+        PORT: ${{ secrets.PORT }}
 
     - name: Runnig linter
       run: yarn lint
