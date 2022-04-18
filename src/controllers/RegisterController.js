@@ -4,10 +4,12 @@ module.exports = {
   async index(req, res) {
     const request = new sql.Request()
 
-    const { filial, produto, busca_cod_produto, busca_desc_produto } = req.query
+    const { filial, produto, top, busca_cod_produto, busca_desc_produto } =
+      req.query
 
     let filial_condition
     let produto_condition
+    let top_condition
     let busca_cod_produto_condition
     let busca_desc_produto_condition
 
@@ -15,6 +17,12 @@ module.exports = {
       filial_condition = `SB1.B1_FILIAL IN ('${filial.slice(0, 2)}') AND`
     } else {
       filial_condition = ``
+    }
+
+    if (top != null) {
+      top_condition = `TOP ${top}`
+    } else {
+      top_condition = ``
     }
 
     if (produto != null) {
@@ -40,7 +48,7 @@ module.exports = {
     // query to the database and get the records
     await request.query(
       `
-            SELECT
+            SELECT  ${top_condition}
                     RTRIM(SB1.B1_COD) AS CODIGO,
                     RTRIM(SB1.B1_DESC) AS DESCRICAO,
                     RTRIM(SB1.B1_ZZLOCA) AS LOCACAO,
