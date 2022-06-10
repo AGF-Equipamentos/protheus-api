@@ -15,6 +15,7 @@ const FatController = require('./controllers/FatController')
 const AverageController = require('./controllers/AverageController')
 const InputDocsController = require('./controllers/InputDocsController')
 const PriceController = require('./controllers/PriceController')
+const PcGroupedController = require('./controllers/PcGroupedController')
 
 routes.get('/estoques', EstoqueController.index)
 routes.get('/pcs', PCsController.index)
@@ -30,5 +31,6 @@ routes.get('/fat', FatController.index)
 routes.get('/average', AverageController.index)
 routes.get('/inputdocs', InputDocsController.index)
 routes.get('/price', PriceController.index)
+routes.get('/purchases-grouped', PcGroupedController.index)
 
 module.exports = routes
