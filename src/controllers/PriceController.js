@@ -67,7 +67,7 @@ module.exports = {
                     DA1.DA1_PRCVEN AS price,
                     DA1.DA1_CODTAB AS table_pn
 
-            FROM	  DA1010 AS DA1 WITH (READPAST)
+            FROM	  DA1010 AS DA1 WITH (NOLOCK)
 
             WHERE	  ${part_number_condition}
                     ${table_pn_condition}
