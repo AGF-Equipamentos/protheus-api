@@ -16,6 +16,7 @@ const AverageController = require('./controllers/AverageController')
 const InputDocsController = require('./controllers/InputDocsController')
 const PriceController = require('./controllers/PriceController')
 const PcGroupedController = require('./controllers/PcGroupedController')
+const BranchContactsController = require('./controllers/BranchContactsController')
 
 routes.get('/estoques', EstoqueController.index)
 routes.get('/pcs', PCsController.index)
@@ -32,5 +33,6 @@ routes.get('/average', AverageController.index)
 routes.get('/inputdocs', InputDocsController.index)
 routes.get('/price', PriceController.index)
 routes.get('/purchases-grouped', PcGroupedController.index)
+routes.get('/branch-contacts', BranchContactsController.index)
 
 module.exports = routes
