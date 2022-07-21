@@ -82,7 +82,7 @@ module.exports = {
                     SC7.C7_CONAPRO AS APROVADO,
                     CONCAT(SUBSTRING(SC7.C7_EMISSAO,7,2),'/',SUBSTRING(SC7.C7_EMISSAO,5,2),'/',SUBSTRING(SC7.C7_EMISSAO,1,4)) AS EMISSAO,
                     RTRIM(SC7.C7_PRODUTO) AS PRODUTO,
-                    RTRIM(SB1.B1_DESC) AS DESCRICAO,
+                    RTRIM(SC7.C7_DESCRI) AS DESCRICAO,
                     SC7.C7_UM AS UM,
                     SC7.C7_QUANT AS QTD,
                     SC7.C7_QUJE AS QTD_ENT,
