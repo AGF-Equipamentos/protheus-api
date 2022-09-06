@@ -19,7 +19,11 @@ module.exports = {
     }
 
     if (produto != null) {
-      produto_condition = `PRODUTO IN ('${produto}') AND`
+      if (typeof produto === 'object') {
+        produto_condition = `PRODUTO IN ('${produto.join(`','`)}') AND`
+      } else {
+        produto_condition = `PRODUTO IN ('${produto}') AND`
+      }
     } else {
       produto_condition = ``
     }
