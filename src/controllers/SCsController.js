@@ -24,7 +24,11 @@ module.exports = {
     }
 
     if (produto != null) {
-      produto_condition = `SC1.C1_PRODUTO IN ('${produto}') AND`
+      if (typeof produto === 'object') {
+        produto_condition = `SC1.C1_PRODUTO IN ('${produto.join(`','`)}') AND`
+      } else {
+        produto_condition = `SC1.C1_PRODUTO IN ('${produto}') AND`
+      }
     } else {
       produto_condition = ``
     }

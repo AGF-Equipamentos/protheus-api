@@ -54,7 +54,11 @@ module.exports = {
     }
 
     if (produto != null) {
-      produto_condition = `SC7.C7_PRODUTO IN ('${produto}') AND`
+      if (typeof produto === 'object') {
+        produto_condition = `SC.C7_PRODUTO IN ('${produto.join(`','`)}') AND`
+      } else {
+        produto_condition = `SC7.C7_PRODUTO IN ('${produto}') AND`
+      }
     } else {
       produto_condition = ``
     }
@@ -66,9 +70,17 @@ module.exports = {
     }
 
     if (legenda != null && legenda) {
-      legenda_condition = `CASE WHEN C7_RESIDUO <> '' THEN 'RESÍDUO ELIMINADO' WHEN C7_QTDACLA > 0 AND C7_RESIDUO = '' THEN 'PEDIDO USADO EM PRÉ-NOTA' WHEN C7_QUJE = 0 AND C7_QTDACLA = 0 AND
-      C7_RESIDUO = '' THEN 'PENDENTE' WHEN C7_QUJE <> 0 AND C7_QUJE < C7_QUANT AND C7_RESIDUO = '' THEN 'ATENDIDO PARCIALMENTE' WHEN C7_QUJE >= C7_QUANT AND
-      C7_RESIDUO = '' THEN 'PEDIDO ATENDIDO' ELSE '' END IN ('${legenda}') AND`
+      if (typeof legenda === 'object') {
+        legenda_condition = `CASE WHEN C7_RESIDUO <> '' THEN 'RESÍDUO ELIMINADO' WHEN C7_QTDACLA > 0 AND C7_RESIDUO = '' THEN 'PEDIDO USADO EM PRÉ-NOTA' WHEN C7_QUJE = 0 AND C7_QTDACLA = 0 AND
+        C7_RESIDUO = '' THEN 'PENDENTE' WHEN C7_QUJE <> 0 AND C7_QUJE < C7_QUANT AND C7_RESIDUO = '' THEN 'ATENDIDO PARCIALMENTE' WHEN C7_QUJE >= C7_QUANT AND
+        C7_RESIDUO = '' THEN 'PEDIDO ATENDIDO' ELSE '' END IN ('${legenda.join(
+          `','`
+        )}') AND`
+      } else {
+        legenda_condition = `CASE WHEN C7_RESIDUO <> '' THEN 'RESÍDUO ELIMINADO' WHEN C7_QTDACLA > 0 AND C7_RESIDUO = '' THEN 'PEDIDO USADO EM PRÉ-NOTA' WHEN C7_QUJE = 0 AND C7_QTDACLA = 0 AND
+        C7_RESIDUO = '' THEN 'PENDENTE' WHEN C7_QUJE <> 0 AND C7_QUJE < C7_QUANT AND C7_RESIDUO = '' THEN 'ATENDIDO PARCIALMENTE' WHEN C7_QUJE >= C7_QUANT AND
+        C7_RESIDUO = '' THEN 'PEDIDO ATENDIDO' ELSE '' END IN ('${legenda}') AND`
+      }
     } else {
       legenda_condition = ``
     }
