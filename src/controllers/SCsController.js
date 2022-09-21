@@ -24,11 +24,7 @@ module.exports = {
     }
 
     if (produto != null) {
-      if (typeof produto === 'object') {
-        produto_condition = `SC1.C1_PRODUTO IN ('${produto.join(`','`)}') AND`
-      } else {
-        produto_condition = `SC1.C1_PRODUTO IN ('${produto}') AND`
-      }
+      produto_condition = `SC1.C1_PRODUTO IN ('${produto}') AND`
     } else {
       produto_condition = ``
     }
@@ -54,8 +50,7 @@ module.exports = {
                     RTRIM(SC1.C1_OBS) AS OBS,
                     CONCAT(SUBSTRING(SC1.C1_DATPRF,7,2),'/',SUBSTRING(SC1.C1_DATPRF,5,2),'/',SUBSTRING(SC1.C1_DATPRF,1,4)) AS ENTREGA,
                     SC1.C1_PEDIDO AS PC,
-                    CONCAT(SUBSTRING(SC7.C7_DATPRF,7,2),'/',SUBSTRING(SC7.C7_DATPRF,5,2),'/',SUBSTRING(SC7.C7_DATPRF,1,4)) AS PC_ENTREGA,
-                    RTRIM(SC1.C1_OP) AS OP
+                    CONCAT(SUBSTRING(SC7.C7_DATPRF,7,2),'/',SUBSTRING(SC7.C7_DATPRF,5,2),'/',SUBSTRING(SC7.C7_DATPRF,1,4)) AS PC_ENTREGA
 
             FROM	  SC1010 AS SC1 WITH (NOLOCK) INNER JOIN
                     SB1010 AS SB1 WITH (NOLOCK) ON SB1.D_E_L_E_T_ = '' AND SB1.B1_COD = SC1.C1_PRODUTO LEFT OUTER JOIN
@@ -72,14 +67,7 @@ module.exports = {
             ORDER BY SC1.C1_DATPRF, SC1.C1_NUM, SC1.C1_ITEM
             `,
       function (err, recordset) {
-        if (err) {
-          console.log(err)
-          return res.json({
-            error: {
-              message: err
-            }
-          })
-        }
+        if (err) console.log(err)
 
         return res.json(recordset.recordsets[0])
         // send records as a response

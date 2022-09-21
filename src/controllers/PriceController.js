@@ -76,14 +76,7 @@ module.exports = {
 
             `,
       function (err, recordset) {
-        if (err) {
-          console.log(err)
-          return res.json({
-            error: {
-              message: err
-            }
-          })
-        }
+        if (err) console.log(err)
         console.log(recordset.recordsets[0])
         return res.json(
           recordset.recordsets[0].length > 1
