@@ -48,7 +48,14 @@ module.exports = {
 
             `,
       function (err, recordset) {
-        if (err) console.log(err)
+        if (err) {
+          console.log(err)
+          return res.json({
+            error: {
+              message: err
+            }
+          })
+        }
 
         return res.json(recordset.recordsets[0])
         // send records as a response
