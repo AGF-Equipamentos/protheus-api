@@ -14,7 +14,6 @@
   },
   "dependencies": {
     "cors": "^2.8.5",
-    "date-fns": "^2.29.2",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "mssql": "^5.1.0"

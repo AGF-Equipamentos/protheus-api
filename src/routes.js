@@ -17,7 +17,6 @@ const InputDocsController = require('./controllers/InputDocsController')
 const PriceController = require('./controllers/PriceController')
 const PcGroupedController = require('./controllers/PcGroupedController')
 const BranchContactsController = require('./controllers/BranchContactsController')
-const KardexController = require('./controllers/KardexController')
 
 routes.get('/estoques', EstoqueController.index)
 routes.get('/pcs', PCsController.index)
@@ -35,6 +34,5 @@ routes.get('/inputdocs', InputDocsController.index)
 routes.get('/price', PriceController.index)
 routes.get('/purchases-grouped', PcGroupedController.index)
 routes.get('/branch-contacts', BranchContactsController.index)
-routes.get('/kardex', KardexController.index)
 
 module.exports = routes

@@ -54,11 +54,7 @@ module.exports = {
     }
 
     if (produto != null) {
-      if (typeof produto === 'object') {
-        produto_condition = `SC7.C7_PRODUTO IN ('${produto.join(`','`)}') AND`
-      } else {
-        produto_condition = `SC7.C7_PRODUTO IN ('${produto}') AND`
-      }
+      produto_condition = `SC7.C7_PRODUTO IN ('${produto}') AND`
     } else {
       produto_condition = ``
     }
@@ -70,17 +66,9 @@ module.exports = {
     }
 
     if (legenda != null && legenda) {
-      if (typeof legenda === 'object') {
-        legenda_condition = `CASE WHEN C7_RESIDUO <> '' THEN 'RESÍDUO ELIMINADO' WHEN C7_QTDACLA > 0 AND C7_RESIDUO = '' THEN 'PEDIDO USADO EM PRÉ-NOTA' WHEN C7_QUJE = 0 AND C7_QTDACLA = 0 AND
-        C7_RESIDUO = '' THEN 'PENDENTE' WHEN C7_QUJE <> 0 AND C7_QUJE < C7_QUANT AND C7_RESIDUO = '' THEN 'ATENDIDO PARCIALMENTE' WHEN C7_QUJE >= C7_QUANT AND
-        C7_RESIDUO = '' THEN 'PEDIDO ATENDIDO' ELSE '' END IN ('${legenda.join(
-          `','`
-        )}') AND`
-      } else {
-        legenda_condition = `CASE WHEN C7_RESIDUO <> '' THEN 'RESÍDUO ELIMINADO' WHEN C7_QTDACLA > 0 AND C7_RESIDUO = '' THEN 'PEDIDO USADO EM PRÉ-NOTA' WHEN C7_QUJE = 0 AND C7_QTDACLA = 0 AND
-        C7_RESIDUO = '' THEN 'PENDENTE' WHEN C7_QUJE <> 0 AND C7_QUJE < C7_QUANT AND C7_RESIDUO = '' THEN 'ATENDIDO PARCIALMENTE' WHEN C7_QUJE >= C7_QUANT AND
-        C7_RESIDUO = '' THEN 'PEDIDO ATENDIDO' ELSE '' END IN ('${legenda}') AND`
-      }
+      legenda_condition = `CASE WHEN C7_RESIDUO <> '' THEN 'RESÍDUO ELIMINADO' WHEN C7_QTDACLA > 0 AND C7_RESIDUO = '' THEN 'PEDIDO USADO EM PRÉ-NOTA' WHEN C7_QUJE = 0 AND C7_QTDACLA = 0 AND
+      C7_RESIDUO = '' THEN 'PENDENTE' WHEN C7_QUJE <> 0 AND C7_QUJE < C7_QUANT AND C7_RESIDUO = '' THEN 'ATENDIDO PARCIALMENTE' WHEN C7_QUJE >= C7_QUANT AND
+      C7_RESIDUO = '' THEN 'PEDIDO ATENDIDO' ELSE '' END IN ('${legenda}') AND`
     } else {
       legenda_condition = ``
     }
@@ -108,8 +96,7 @@ module.exports = {
                     C7_RESIDUO = '' THEN 'PEDIDO ATENDIDO' ELSE '' END AS LEGENDA,
                     CONCAT(SUBSTRING(SC7.C7_DATPRF,7,2),'/',SUBSTRING(SC7.C7_DATPRF,5,2),'/',SUBSTRING(SC7.C7_DATPRF,1,4)) AS ENTREGA,
                     RTRIM(SA2.A2_NREDUZ) AS DESC_FORN,
-                    RTRIM(SA2.A2_CGC) AS CNPJ,
-                    RTRIM(SC7.C7_OP) AS OP
+                    RTRIM(SA2.A2_CGC) AS CNPJ
 
             FROM	  SC7010 AS SC7 WITH (NOLOCK) INNER JOIN
                     SB1010 AS SB1 WITH (NOLOCK) ON SB1.D_E_L_E_T_ = '' AND SB1.B1_FILIAL = LEFT('${filial}', 2) AND SB1.B1_COD = SC7.C7_PRODUTO LEFT OUTER JOIN
@@ -128,14 +115,7 @@ module.exports = {
             ORDER BY ${desc_condition}
             `,
       function (err, recordset) {
-        if (err) {
-          console.log(err)
-          return res.json({
-            error: {
-              message: err
-            }
-          })
-        }
+        if (err) console.log(err)
 
         return res.json(recordset.recordsets[0])
         // send records as a response
