@@ -13,7 +13,11 @@ module.exports = {
     let armazem_condition
 
     if (filial != null) {
-      filial_condition = `FILIAL IN (${filial}) AND`
+      if (typeof filial === 'object') {
+        filial_condition = `FILIAL IN ('${filial.join(`','`)}') AND`
+      } else {
+        filial_condition = `FILIAL IN (${filial}) AND`
+      }
     } else {
       filial_condition = ``
     }
@@ -29,7 +33,11 @@ module.exports = {
     }
 
     if (grupo != null) {
-      grupo_condition = `GRUPO IN ('${grupo}') AND`
+      if (typeof grupo === 'object') {
+        grupo_condition = `GRUPO IN ('${grupo.join(`','`)}') AND`
+      } else {
+        grupo_condition = `GRUPO IN ('${grupo}') AND`
+      }
     } else {
       grupo_condition = ``
     }

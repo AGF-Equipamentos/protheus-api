@@ -108,7 +108,8 @@ module.exports = {
                     C7_RESIDUO = '' THEN 'PEDIDO ATENDIDO' ELSE '' END AS LEGENDA,
                     CONCAT(SUBSTRING(SC7.C7_DATPRF,7,2),'/',SUBSTRING(SC7.C7_DATPRF,5,2),'/',SUBSTRING(SC7.C7_DATPRF,1,4)) AS ENTREGA,
                     RTRIM(SA2.A2_NREDUZ) AS DESC_FORN,
-                    RTRIM(SA2.A2_CGC) AS CNPJ
+                    RTRIM(SA2.A2_CGC) AS CNPJ,
+                    RTRIM(SC7.C7_OP) AS OP
 
             FROM	  SC7010 AS SC7 WITH (NOLOCK) INNER JOIN
                     SB1010 AS SB1 WITH (NOLOCK) ON SB1.D_E_L_E_T_ = '' AND SB1.B1_FILIAL = LEFT('${filial}', 2) AND SB1.B1_COD = SC7.C7_PRODUTO LEFT OUTER JOIN
