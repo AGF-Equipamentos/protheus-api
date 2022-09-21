@@ -55,7 +55,7 @@ module.exports = {
 
     if (produto != null) {
       if (typeof produto === 'object') {
-        produto_condition = `SC.C7_PRODUTO IN ('${produto.join(`','`)}') AND`
+        produto_condition = `SC7.C7_PRODUTO IN ('${produto.join(`','`)}') AND`
       } else {
         produto_condition = `SC7.C7_PRODUTO IN ('${produto}') AND`
       }
