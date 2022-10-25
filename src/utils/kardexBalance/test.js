@@ -8,7 +8,7 @@ describe('balanceTotalkardex()', () => {
     expect(kardex).toStrictEqual([
       {
         Filial: '0101',
-        'Data Mov.': '2022-07-31T00:00:00.000Z',
+        'Data Mov.': '2022-07-31T00:00:00.000',
         Movimento: 'Saldo Inicial',
         Produto: 'VIXMOT0011',
         'Descr. Produto':
@@ -33,7 +33,7 @@ describe('balanceTotalkardex()', () => {
       },
       {
         Filial: '0101',
-        'Data Mov.': '2022-08-04T00:00:00.000Z',
+        'Data Mov.': '2022-08-04T00:00:00.000',
         Movimento: 'NF Entrada',
         Produto: 'VIXMOT0011',
         'Descr. Produto':
@@ -58,7 +58,7 @@ describe('balanceTotalkardex()', () => {
       },
       {
         Filial: '0101',
-        'Data Mov.': '2022-08-04T00:00:00.000Z',
+        'Data Mov.': '2022-08-04T00:00:00.000',
         Movimento: 'NF Entrada',
         Produto: 'VIXMOT0011',
         'Descr. Produto':
@@ -83,7 +83,7 @@ describe('balanceTotalkardex()', () => {
       },
       {
         Filial: '0101',
-        'Data Mov.': '2022-08-04T00:00:00.000Z',
+        'Data Mov.': '2022-08-04T00:00:00.000',
         Movimento: 'NF Entrada',
         Produto: 'VIXMOT0011',
         'Descr. Produto':
@@ -108,7 +108,7 @@ describe('balanceTotalkardex()', () => {
       },
       {
         Filial: '0101',
-        'Data Mov.': '2022-08-06T00:00:00.000Z',
+        'Data Mov.': '2022-08-06T00:00:00.000',
         Movimento: 'Mov. Estoque - Saída',
         Produto: 'VIXMOT0011',
         'Descr. Produto':
@@ -133,7 +133,7 @@ describe('balanceTotalkardex()', () => {
       },
       {
         Filial: '0101',
-        'Data Mov.': '2022-08-12T00:00:00.000Z',
+        'Data Mov.': '2022-08-12T00:00:00.000',
         Movimento: 'Mov. Estoque - Saída',
         Produto: 'VIXMOT0011',
         'Descr. Produto':
