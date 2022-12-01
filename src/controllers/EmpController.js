@@ -29,7 +29,11 @@ module.exports = {
     }
 
     if (produto != null) {
-      produto_condition = `SD4.D4_COD IN ('${produto}') AND`
+      if (typeof produto === 'object') {
+        produto_condition = `SD4.D4_COD IN ('${produto.join(`','`)}') AND`
+      } else {
+        produto_condition = `SD4.D4_COD IN ('${produto}') AND`
+      }
     } else {
       produto_condition = ``
     }
