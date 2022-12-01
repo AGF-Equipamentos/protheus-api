@@ -26,7 +26,11 @@ module.exports = {
     }
 
     if (produto != null) {
-      produto_condition = `SB1.B1_COD IN ('${produto}') AND`
+      if (typeof produto === 'object') {
+        produto_condition = `SB1.B1_COD IN ('${produto.join(`','`)}') AND`
+      } else {
+        produto_condition = `SB1.B1_COD IN ('${produto}') AND`
+      }
     } else {
       produto_condition = ``
     }
