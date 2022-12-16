@@ -1,3 +1,4 @@
+const sql = require('mssql')
 const { PutObjectCommand, S3Client } = require('@aws-sdk/client-s3')
 const crypto = require('crypto')
 // const axios = require('axios')
@@ -5,7 +6,46 @@ const test = require('../../test.json')
 
 module.exports = {
   async index(req, res) {
-    const { message = 'TEST-0002;3\nJOSE-002;5\nTEST-0003;2' } = req.query
+    const request = new sql.Request()
+    const {
+      message = 'TEST-0002;3\nJOSE-002;5\nTEST-0003;2',
+      cnpj_client,
+      branch
+    } = req.query
+
+    let cnpj_client_condition
+    let branch_condition
+
+    if (branch != null) {
+      branch_condition = `SA1.A1_FILIAL IN ('${branch}') AND`
+    } else {
+      branch_condition = ``
+    }
+
+    if (cnpj_client != null) {
+      cnpj_client_condition = `SA1.A1_CGC IN ('${cnpj_client}') AND`
+    } else {
+      cnpj_client_condition = ``
+    }
+
+    const client_data = await request.query(
+      `
+            SELECT
+                    RTRIM(SA1.A1_COD) AS client_code
+
+            FROM    SA1010 AS SA1 WITH (NOLOCK)
+
+            WHERE
+                    ${branch_condition}
+                    ${cnpj_client_condition}
+                    SA1.A1_MSBLQL <> 1 AND
+                    SA1.D_E_L_E_T_ = ''
+
+            `
+    )
+
+    const client_code = client_data.recordsets[0][0].client_code
+    console.log(client_code)
 
     // const api = axios.create({
     //   baseURL: process.env.PROTHEUS_API
@@ -69,7 +109,7 @@ module.exports = {
     //     {
     //       orcamento: [
     //         {
-    //           codigo_cliente: '001219',
+    //           codigo_cliente: client_code,
     //           loja_cliente: '01',
     //           condicao_pagamento: '005',
     //           natureza_financeira: '10102',
