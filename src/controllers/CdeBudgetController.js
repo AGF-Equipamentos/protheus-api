@@ -1,8 +1,8 @@
 const sql = require('mssql')
 const { PutObjectCommand, S3Client } = require('@aws-sdk/client-s3')
 const crypto = require('crypto')
-// const axios = require('axios')
-const test = require('../../test.json')
+const axios = require('axios')
+// const test = require('../../test.json')
 
 module.exports = {
   async index(req, res) {
@@ -47,27 +47,27 @@ module.exports = {
     const client_code = client_data.recordsets[0][0].client_code
     console.log(client_code)
 
-    // const api = axios.create({
-    //   baseURL: process.env.PROTHEUS_API
-    // })
+    const api = axios.create({
+      baseURL: process.env.PROTHEUS_API
+    })
 
-    // const {
-    //   data: { access_token }
-    // } = await api
-    //   .post('/restapi/api/oauth2/v1/token', null, {
-    //     params: {
-    //       grant_type: 'password',
-    //       username: process.env.PROTHEUS_USERNAME,
-    //       password: process.env.PROTHEUS_PASSWORD
-    //     }
-    //   })
-    //   .catch((err) => console.log('auth', err))
+    const {
+      data: { access_token }
+    } = await api
+      .post('api/oauth2/v1/token', null, {
+        params: {
+          grant_type: 'password',
+          username: process.env.PROTHEUS_LOGIN_USERNAME,
+          password: process.env.PROTHEUS_LOGIN_PASSWORD
+        }
+      })
+      .catch((err) => console.log('auth', err))
 
-    // console.log(access_token)
+    console.log(access_token)
 
-    // if (access_token) {
-    //   api.defaults.headers.authorization = `Bearer ${access_token}`
-    // }
+    if (access_token) {
+      api.defaults.headers.authorization = `Bearer ${access_token}`
+    }
 
     console.log(message)
 
@@ -76,58 +76,58 @@ module.exports = {
 
     console.log(budgetCodes)
 
-    // const { data: partNumbersData } = await api
-    //   .get('/restapi/partnumber', {
-    //     params: {
-    //       userlog: '000001',
-    //       company: '01',
-    //       branch: '0201'
-    //     },
-    //     data: {
-    //       part_number: budgetCodes
-    //     }
-    //   })
-    //   .catch((err) => console.log('partNumber', err))
-    // const partNumbers = partNumbersData.data.produto
+    const { data: partNumbersData } = await api
+      .get('partnumber', {
+        params: {
+          userlog: '000001',
+          company: '01',
+          branch: '0201'
+        },
+        data: {
+          part_number: budgetCodes
+        }
+      })
+      .catch((err) => console.log('partNumber', err))
+    const partNumbers = partNumbersData.data.produto
 
-    // const budgetItems = partNumbers.map((partNumber) => {
-    //   const item = messageItems.find(
-    //     (item) => item[0] === partNumber.part_number
-    //   )
+    const budgetItems = partNumbers.map((partNumber) => {
+      const item = messageItems.find(
+        (item) => item[0] === partNumber.part_number
+      )
 
-    //   return {
-    //     produto: partNumber.codigo,
-    //     quantidade: Number(item[1]),
-    //     tipo_operacao: '01',
-    //     part_number: partNumber.part_number
-    //   }
-    // })
+      return {
+        produto: partNumber.codigo,
+        quantidade: Number(item[1]),
+        tipo_operacao: '01',
+        part_number: partNumber.part_number
+      }
+    })
 
-    // const { data: budget } = await api
-    //   .post(
-    //     '/restapi/orcamentovenda',
-    //     {
-    //       orcamento: [
-    //         {
-    //           codigo_cliente: client_code,
-    //           loja_cliente: '01',
-    //           condicao_pagamento: '005',
-    //           natureza_financeira: '10102',
-    //           vendedor1: '000011',
-    //           supervisor: '000001',
-    //           tabela: '017',
-    //           itens: budgetItems
-    //         }
-    //       ]
-    //     },
-    //     {
-    //       params: {
-    //         company: '01',
-    //         branch: '0201'
-    //       }
-    //     }
-    //   )
-    //   .catch((err) => console.log('budget', err))
+    const { data: budget } = await api
+      .post(
+        '/orcamentovenda',
+        {
+          orcamento: [
+            {
+              codigo_cliente: client_code,
+              loja_cliente: '01',
+              condicao_pagamento: '005',
+              natureza_financeira: '10102',
+              vendedor1: '000011',
+              supervisor: '000001',
+              tabela: '017',
+              itens: budgetItems
+            }
+          ]
+        },
+        {
+          params: {
+            company: '01',
+            branch: '0201'
+          }
+        }
+      )
+      .catch((err) => console.log('budget', err))
 
     // Initialize S3 Client
     const s3Client = new S3Client({
@@ -137,9 +137,10 @@ module.exports = {
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
       }
     })
+    console.log(budget)
 
-    const pdfBase64 = test.data.orcamentovenda[1].fileContent
-    // const pdfBase64 = budget.data.orcamentovenda[1].fileContent
+    // const pdfBase64 = test.data.orcamentovenda[1].fileContent
+    const pdfBase64 = budget.data.orcamentovenda[1].fileContent
 
     const pdf = Buffer.from(pdfBase64, 'base64')
     const filename = `budgets/orcamento-${crypto.randomUUID()}`
