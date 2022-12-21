@@ -51,6 +51,12 @@ module.exports = {
     const client_code = client_data.recordsets[0][0].client_code
     console.log(client_code)
 
+    const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID
+    const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN
+
+    // Create an authenticated client to access the Twilio REST API
+    const client = twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+
     const api = axios.create({
       baseURL: process.env.PROTHEUS_API
     })
@@ -176,12 +182,6 @@ module.exports = {
         `https://${process.env.AWS_BUCKET_NAME}.s3.amazonaws.com/${filename}.pdf`
       )
 
-      const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID
-      const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN
-
-      // Create an authenticated client to access the Twilio REST API
-      const client = twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
-
       // Send a message via whatsapp with the pdf
       await client.messages
         .create({
@@ -201,6 +201,14 @@ module.exports = {
       })
     } catch (err) {
       console.log('budget', err)
+      await client.messages
+        .create({
+          body: 'Houve um erro, por favor tente novamente',
+          from: from_number,
+          to: to_number
+        })
+        .then((message) => console.log(message.sid))
+
       return res.json({
         error: err
       })
