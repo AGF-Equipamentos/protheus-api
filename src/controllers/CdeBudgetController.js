@@ -2,6 +2,7 @@ const sql = require('mssql')
 const { PutObjectCommand, S3Client } = require('@aws-sdk/client-s3')
 const crypto = require('crypto')
 const axios = require('axios')
+const twilio = require('twilio')
 // const test = require('../../test.json')
 
 module.exports = {
@@ -10,8 +11,11 @@ module.exports = {
     const {
       message = 'TEST-0002;3\nJOSE-002;5\nTEST-0003;2',
       cnpj_client,
-      branch
+      branch,
+      from_number,
+      to_number
     } = req.query
+    console.log(req.query)
 
     let cnpj_client_condition
     let branch_condition
@@ -103,8 +107,8 @@ module.exports = {
       }
     })
 
-    const { data: budget } = await api
-      .post(
+    try {
+      const { data: budget } = await api.post(
         '/orcamentovenda',
         {
           orcamento: [
@@ -127,57 +131,79 @@ module.exports = {
           }
         }
       )
-      .catch((err) => console.log('budget', err))
 
-    // Initialize S3 Client
-    const s3Client = new S3Client({
-      region: 'us-east-1',
-      credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+      // Initialize S3 Client
+      const s3Client = new S3Client({
+        region: 'us-east-1',
+        credentials: {
+          accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+        }
+      })
+      console.log(budget)
+
+      // const pdfBase64 = test.data.orcamentovenda[1].fileContent
+      const pdfBase64 = budget.data.orcamentovenda[1].fileContent
+
+      const pdf = Buffer.from(pdfBase64, 'base64')
+      const filename = `budgets/orcamento-${crypto.randomUUID()}`
+      const params = {
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: `${filename}.pdf`,
+        Body: pdf
       }
-    })
-    console.log(budget)
 
-    // const pdfBase64 = test.data.orcamentovenda[1].fileContent
-    const pdfBase64 = budget.data.orcamentovenda[1].fileContent
-
-    const pdf = Buffer.from(pdfBase64, 'base64')
-    const filename = `budgets/orcamento-${crypto.randomUUID()}`
-    const params = {
-      Bucket: process.env.AWS_BUCKET_NAME,
-      Key: `${filename}.pdf`,
-      Body: pdf
-    }
-
-    const updatePdfToS3 = async () => {
-      // Create an object and upload it to the Amazon S3 bucket.
-      try {
-        const results = await s3Client.send(new PutObjectCommand(params))
-        console.log(
-          'Successfully created ' +
-            params.Key +
-            ' and uploaded it to ' +
-            params.Bucket +
-            '/' +
-            params.Key
-        )
-        return results // For unit tests.
-      } catch (err) {
-        console.log('Error', err)
+      const updatePdfToS3 = async () => {
+        // Create an object and upload it to the Amazon S3 bucket.
+        try {
+          const results = await s3Client.send(new PutObjectCommand(params))
+          console.log(
+            'Successfully created ' +
+              params.Key +
+              ' and uploaded it to ' +
+              params.Bucket +
+              '/' +
+              params.Key
+          )
+          return results // For unit tests.
+        } catch (err) {
+          console.log('Error', err)
+        }
       }
+
+      await updatePdfToS3()
+      console.log(
+        `https://${process.env.AWS_BUCKET_NAME}.s3.amazonaws.com/${filename}.pdf`
+      )
+
+      const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID
+      const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN
+
+      // Create an authenticated client to access the Twilio REST API
+      const client = twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+
+      // Send a message via whatsapp with the pdf
+      await client.messages
+        .create({
+          mediaUrl: [
+            `https://${process.env.AWS_BUCKET_NAME}.s3.amazonaws.com/${filename}.pdf`
+          ],
+          from: from_number,
+          to: to_number
+        })
+        .then((message) => console.log(message.sid))
+
+      // This callback is what is returned in response to this function being invoked.
+      // It's really important! E.g. you might respond with TWiML here for a voice or SMS response.
+      // Or you might return JSON data to a studio flow. Don't forget it!
+      return res.json({
+        mediaUrl: `https://${process.env.AWS_BUCKET_NAME}.s3.amazonaws.com/${filename}.pdf`
+      })
+    } catch (err) {
+      console.log('budget', err)
+      return res.json({
+        error: err
+      })
     }
-
-    await updatePdfToS3()
-    console.log(
-      `https://${process.env.AWS_BUCKET_NAME}.s3.amazonaws.com/${filename}.pdf`
-    )
-
-    // This callback is what is returned in response to this function being invoked.
-    // It's really important! E.g. you might respond with TWiML here for a voice or SMS response.
-    // Or you might return JSON data to a studio flow. Don't forget it!
-    return res.json({
-      mediaUrl: `https://${process.env.AWS_BUCKET_NAME}.s3.amazonaws.com/${filename}.pdf`
-    })
   }
 }
