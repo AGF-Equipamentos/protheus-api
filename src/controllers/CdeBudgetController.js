@@ -34,7 +34,7 @@ module.exports = {
     }
 
     if (cnpj_client != null) {
-      cnpj_client_condition = `SA1.A1_CGC IN ('${cnpj_client}') AND`
+      cnpj_client_condition = `SA1.A1_CGC IN ('${cnpj_client.trim()}') AND`
     } else {
       cnpj_client_condition = ``
     }
@@ -245,7 +245,7 @@ module.exports = {
     }
 
     if (cnpj_client != null) {
-      cnpj_client_condition = `SA1.A1_CGC IN ('${cnpj_client}') AND`
+      cnpj_client_condition = `SA1.A1_CGC IN ('${cnpj_client.trim()}') AND`
     } else {
       cnpj_client_condition = ``
     }
@@ -407,7 +407,7 @@ module.exports = {
         mediaUrl: `https://${process.env.AWS_BUCKET_NAME}.s3.amazonaws.com/${filename}.pdf`
       })
     } catch (err) {
-      console.log('budget', err)
+      console.log(typeof err, err)
 
       if (from_number && to_number) {
         await client.messages
@@ -422,7 +422,7 @@ module.exports = {
       res.status(500)
       return res.json({
         error: {
-          message: err
+          message: String(err)
         }
       })
     }
