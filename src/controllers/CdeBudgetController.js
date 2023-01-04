@@ -8,6 +8,13 @@ const twilio = require('twilio')
 module.exports = {
   async index(req, res) {
     const request = new sql.Request()
+
+    // Create an authenticated client to access the Twilio REST API
+    const client = twilio(
+      process.env.TWILIO_ACCOUNT_SID,
+      process.env.TWILIO_AUTH_TOKEN
+    )
+
     const {
       message = 'TEST-0002;3\nJOSE-002;5\nTEST-0003;2',
       cnpj_client,
@@ -21,7 +28,7 @@ module.exports = {
     let branch_condition
 
     if (branch != null) {
-      branch_condition = `SA1.A1_FILIAL IN ('${branch}') AND`
+      branch_condition = `SA1.A1_FILIAL IN ('${branch.slice(0, 2)}') AND`
     } else {
       branch_condition = ``
     }
@@ -32,8 +39,16 @@ module.exports = {
       cnpj_client_condition = ``
     }
 
-    const client_data = await request.query(
-      `
+    console.log(message)
+
+    const messageItems = message.split('\n').map((item) => item.split(';'))
+    const budgetCodes = messageItems.map((item) => ({ id: item[0] }))
+
+    console.log(budgetCodes)
+
+    try {
+      const client_data = await request.query(
+        `
             SELECT
                     RTRIM(SA1.A1_COD) AS client_code
 
@@ -46,48 +61,30 @@ module.exports = {
                     SA1.D_E_L_E_T_ = ''
 
             `
-    )
+      )
 
-    const client_code = client_data.recordsets[0][0].client_code
-    console.log(client_code)
+      const client_code = client_data.recordsets[0][0].client_code
+      console.log(client_code)
 
-    const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID
-    const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN
+      const api = axios.create({
+        baseURL: process.env.PROTHEUS_API
+      })
 
-    // Create an authenticated client to access the Twilio REST API
-    const client = twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
-
-    const api = axios.create({
-      baseURL: process.env.PROTHEUS_API
-    })
-
-    const {
-      data: { access_token }
-    } = await api
-      .post('api/oauth2/v1/token', null, {
+      const {
+        data: { access_token }
+      } = await api.post('api/oauth2/v1/token', null, {
         params: {
           grant_type: 'password',
           username: process.env.PROTHEUS_LOGIN_USERNAME,
           password: process.env.PROTHEUS_LOGIN_PASSWORD
         }
       })
-      .catch((err) => console.log('auth', err))
 
-    console.log(access_token)
+      if (access_token) {
+        api.defaults.headers.authorization = `Bearer ${access_token}`
+      }
 
-    if (access_token) {
-      api.defaults.headers.authorization = `Bearer ${access_token}`
-    }
-
-    console.log(message)
-
-    const messageItems = message.split('\n').map((item) => item.split(';'))
-    const budgetCodes = messageItems.map((item) => ({ id: item[0] }))
-
-    console.log(budgetCodes)
-
-    const { data: partNumbersData } = await api
-      .get('partnumber', {
+      const { data: partNumbersData } = await api.get('partnumber', {
         params: {
           userlog: '000001',
           company: '01',
@@ -97,23 +94,22 @@ module.exports = {
           part_number: budgetCodes
         }
       })
-      .catch((err) => console.log('partNumber', err))
-    const partNumbers = partNumbersData.data.produto
 
-    const budgetItems = partNumbers.map((partNumber) => {
-      const item = messageItems.find(
-        (item) => item[0] === partNumber.part_number
-      )
+      const partNumbers = partNumbersData.data.produto
 
-      return {
-        produto: partNumber.codigo,
-        quantidade: Number(item[1]),
-        tipo_operacao: '01',
-        part_number: partNumber.part_number
-      }
-    })
+      const budgetItems = partNumbers.map((partNumber) => {
+        const item = messageItems.find(
+          (item) => item[0] === partNumber.part_number
+        )
 
-    try {
+        return {
+          produto: partNumber.codigo,
+          quantidade: Number(item[1]),
+          tipo_operacao: '01',
+          part_number: partNumber.part_number
+        }
+      })
+
       const { data: budget } = await api.post(
         '/orcamentovenda',
         {
@@ -133,7 +129,7 @@ module.exports = {
         {
           params: {
             company: '01',
-            branch: '0201'
+            branch
           }
         }
       )
@@ -146,6 +142,7 @@ module.exports = {
           secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
         }
       })
+
       console.log(budget)
 
       // const pdfBase64 = test.data.orcamentovenda[1].fileContent
@@ -161,23 +158,20 @@ module.exports = {
 
       const updatePdfToS3 = async () => {
         // Create an object and upload it to the Amazon S3 bucket.
-        try {
-          const results = await s3Client.send(new PutObjectCommand(params))
-          console.log(
-            'Successfully created ' +
-              params.Key +
-              ' and uploaded it to ' +
-              params.Bucket +
-              '/' +
-              params.Key
-          )
-          return results // For unit tests.
-        } catch (err) {
-          console.log('Error', err)
-        }
+        const results = await s3Client.send(new PutObjectCommand(params))
+        console.log(
+          'Successfully created ' +
+            params.Key +
+            ' and uploaded it to ' +
+            params.Bucket +
+            '/' +
+            params.Key
+        )
+        return results // For unit tests.
       }
 
       await updatePdfToS3()
+
       console.log(
         `https://${process.env.AWS_BUCKET_NAME}.s3.amazonaws.com/${filename}.pdf`
       )
@@ -203,16 +197,22 @@ module.exports = {
       })
     } catch (err) {
       console.log('budget', err)
-      await client.messages
-        .create({
-          body: 'Houve um erro, por favor tente novamente',
-          from: from_number,
-          to: to_number
-        })
-        .then((message) => console.log(message.sid))
 
+      if (from_number && to_number) {
+        await client.messages
+          .create({
+            body: 'Houve um erro, por favor tente novamente',
+            from: from_number,
+            to: to_number
+          })
+          .then((message) => console.log(message.sid))
+      }
+
+      res.status(500)
       return res.json({
-        error: err
+        error: {
+          message: err
+        }
       })
     }
   }
