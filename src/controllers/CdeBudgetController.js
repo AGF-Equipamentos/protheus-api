@@ -183,15 +183,17 @@ module.exports = {
       )
 
       // Send a message via whatsapp with the pdf
-      await client.messages
-        .create({
-          mediaUrl: [
-            `https://${process.env.AWS_BUCKET_NAME}.s3.amazonaws.com/${filename}.pdf`
-          ],
-          from: from_number,
-          to: to_number
-        })
-        .then((message) => console.log(message.sid))
+      if (from_number && to_number) {
+        await client.messages
+          .create({
+            mediaUrl: [
+              `https://${process.env.AWS_BUCKET_NAME}.s3.amazonaws.com/${filename}.pdf`
+            ],
+            from: from_number,
+            to: to_number
+          })
+          .then((message) => console.log(message.sid))
+      }
 
       // This callback is what is returned in response to this function being invoked.
       // It's really important! E.g. you might respond with TWiML here for a voice or SMS response.
