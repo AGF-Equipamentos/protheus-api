@@ -5,10 +5,11 @@ module.exports = {
     const request = new sql.Request()
 
     //querry request need to declare all the variables!
-    const { filial, produto, grupo, armazem } = req.query
+    const { filial, produto, descricao, grupo, armazem } = req.query
 
     let filial_condition
     let produto_condition
+    let descricao_condition
     let grupo_condition
     let armazem_condition
 
@@ -32,6 +33,16 @@ module.exports = {
       produto_condition = ``
     }
 
+    if (descricao != null) {
+      if (typeof descricao === 'object') {
+        descricao_condition = `DESCRICAO IN ('${descricao.join(`','`)}') AND`
+      } else {
+        descricao_condition = `DESCRICAO IN ('${descricao}') AND`
+      }
+    } else {
+      descricao_condition = ``
+    }
+
     if (grupo != null) {
       if (typeof grupo === 'object') {
         grupo_condition = `GRUPO IN ('${grupo.join(`','`)}') AND`
@@ -51,10 +62,11 @@ module.exports = {
     // query to the database and get the records
     await request.query(
       `
-            SELECT FILIAL,PRODUTO,SALDO,ARMAZEM
+            SELECT FILIAL,PRODUTO,DESCRICAO,SALDO,ARMAZEM
             FROM SALDO_ESTOQUE WITH (NOLOCK)
             WHERE
             ${produto_condition}
+            ${descricao_condition}
             ${grupo_condition}
             ${filial_condition}
             ${armazem_condition}
