@@ -5,7 +5,7 @@ module.exports = {
     const request = new sql.Request()
 
     //querry request need to declare all the variables!
-    const { filial, produto, descricao, grupo, armazem } = req.query
+    const { filial, produto, grupo, armazem } = req.query
 
     let filial_condition
     let produto_condition
@@ -31,16 +31,6 @@ module.exports = {
       }
     } else {
       produto_condition = ``
-    }
-
-    if (descricao != null) {
-      if (typeof descricao === 'object') {
-        descricao_condition = `DESCRICAO IN ('${descricao.join(`','`)}') AND`
-      } else {
-        descricao_condition = `DESCRICAO IN ('${descricao}') AND`
-      }
-    } else {
-      descricao_condition = ``
     }
 
     if (grupo != null) {
