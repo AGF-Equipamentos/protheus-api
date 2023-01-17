@@ -9,7 +9,6 @@ module.exports = {
 
     let filial_condition
     let produto_condition
-    let descricao_condition
     let grupo_condition
     let armazem_condition
 
@@ -56,7 +55,6 @@ module.exports = {
             FROM SALDO_ESTOQUE WITH (NOLOCK)
             WHERE
             ${produto_condition}
-            ${descricao_condition}
             ${grupo_condition}
             ${filial_condition}
             ${armazem_condition}
