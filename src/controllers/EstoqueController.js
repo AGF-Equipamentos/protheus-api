@@ -51,7 +51,7 @@ module.exports = {
     // query to the database and get the records
     await request.query(
       `
-            SELECT FILIAL,PRODUTO,SALDO,ARMAZEM
+            SELECT FILIAL,PRODUTO,DESCRICAO,SALDO,ARMAZEM
             FROM SALDO_ESTOQUE WITH (NOLOCK)
             WHERE
             ${produto_condition}
