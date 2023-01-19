@@ -50,7 +50,8 @@ module.exports = {
       const client_data = await request.query(
         `
             SELECT
-                    RTRIM(SA1.A1_COD) AS client_code
+                    RTRIM(SA1.A1_COD) AS client_code,
+                    RTRIM(SA1.A1_TABELA) AS client_table
 
             FROM    SA1010 AS SA1 WITH (NOLOCK)
 
@@ -62,9 +63,12 @@ module.exports = {
 
             `
       )
+      console.log(client_data.recordsets[0][0])
 
       const client_code = client_data.recordsets[0][0].client_code
-      console.log(client_code)
+      const client_table = client_data.recordsets[0][0].client_table
+      console.log('client_code', client_code)
+      console.log('client_table', client_table)
 
       const api = axios.create({
         baseURL: process.env.PROTHEUS_API
@@ -79,6 +83,7 @@ module.exports = {
           password: process.env.PROTHEUS_LOGIN_PASSWORD
         }
       })
+      console.log('access_token', access_token)
 
       if (access_token) {
         api.defaults.headers.authorization = `Bearer ${access_token}`
@@ -117,11 +122,11 @@ module.exports = {
             {
               codigo_cliente: client_code,
               loja_cliente: '01',
-              condicao_pagamento: '005',
+              condicao_pagamento: '006',
               natureza_financeira: '10102',
-              vendedor1: '000011',
-              supervisor: '000001',
-              tabela: '017',
+              vendedor1: '000000',
+              supervisor: '000000',
+              tabela: client_table === '' ? '007' : client_table,
               itens: budgetItems
             }
           ]
@@ -143,7 +148,7 @@ module.exports = {
         }
       })
 
-      console.log(budget)
+      console.log('budget', budget)
 
       // const pdfBase64 = test.data.orcamentovenda[1].fileContent
       const pdfBase64 = budget.data.orcamentovenda[1].fileContent
