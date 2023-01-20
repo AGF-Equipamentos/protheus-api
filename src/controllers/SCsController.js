@@ -46,7 +46,7 @@ module.exports = {
                     SC1.C1_ITEM AS ITEM,
                     CONCAT(SUBSTRING(SC1.C1_EMISSAO,7,2),'/',SUBSTRING(SC1.C1_EMISSAO,5,2),'/',SUBSTRING(SC1.C1_EMISSAO,1,4)) AS EMISSAO,
                     RTRIM(SC1.C1_PRODUTO) AS PRODUTO,
-                    RTRIM(SB1.B1_DESC) AS DESCRICAO,
+                    RTRIM(SC1.C1_DESCRI) AS DESCRICAO,
                     SC1.C1_UM AS UM,
                     SC1.C1_QUANT AS QTD,
                     SC1.C1_QUJE AS QTD_ENT,
