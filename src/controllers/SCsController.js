@@ -58,8 +58,6 @@ module.exports = {
                     RTRIM(SC1.C1_OP) AS OP
 
             FROM	  SC1010 AS SC1 WITH (NOLOCK) INNER JOIN
-                    SB1010 AS SB1 WITH (NOLOCK) ON SB1.D_E_L_E_T_ = '' AND SB1.B1_COD = SC1.C1_PRODUTO LEFT OUTER JOIN
-                    SA2010 AS SA2 WITH (NOLOCK) ON (SA2.D_E_L_E_T_ = '' AND SA2.A2_FILIAL = '01') AND SA2.A2_COD = SC1.C1_FORNECE LEFT OUTER JOIN
                     SC7010 AS SC7 WITH (NOLOCK) ON SC7.D_E_L_E_T_ = '' AND ((SC7.C7_NUM = SC1.C1_PEDIDO) AND (SC7.C7_ITEM = SC1.C1_ITEMPED))
 
             WHERE	  ${sc_condition}
