@@ -57,7 +57,7 @@ module.exports = {
                     CONCAT(SUBSTRING(SC7.C7_DATPRF,7,2),'/',SUBSTRING(SC7.C7_DATPRF,5,2),'/',SUBSTRING(SC7.C7_DATPRF,1,4)) AS PC_ENTREGA,
                     RTRIM(SC1.C1_OP) AS OP
 
-            FROM	  SC1010 AS SC1 WITH (NOLOCK) INNER JOIN
+            FROM	  SC1010 AS SC1 WITH (NOLOCK) LEFT OUTER JOIN
                     SC7010 AS SC7 WITH (NOLOCK) ON SC7.D_E_L_E_T_ = '' AND ((SC7.C7_NUM = SC1.C1_PEDIDO) AND (SC7.C7_ITEM = SC1.C1_ITEMPED))
 
             WHERE	  ${sc_condition}
