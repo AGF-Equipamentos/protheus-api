@@ -202,8 +202,8 @@ module.exports = {
       })
     } catch (err) {
       // console.log('budget', err)
-      console.log(err.response.status)
-      console.log(err.response.data)
+      console.log(err?.response?.status)
+      console.log(err?.response?.data)
 
       if (from_number && to_number) {
         if (err?.response?.status === 503) {
