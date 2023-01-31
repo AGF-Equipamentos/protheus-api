@@ -125,7 +125,7 @@ module.exports = {
               condicao_pagamento: '006',
               natureza_financeira: '10102',
               vendedor1: '000000',
-              supervisor: '000000',
+              supervisor: '',
               tabela: client_table === '' ? '007' : client_table,
               itens: budgetItems
             }
