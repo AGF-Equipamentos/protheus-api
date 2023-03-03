@@ -38,6 +38,5 @@ routes.get('/purchases-grouped', PcGroupedController.index)
 routes.get('/branch-contacts', BranchContactsController.index)
 routes.get('/kardex', KardexController.index)
 routes.get('/cdebudget', CdeBudgetController.index)
-// routes.post('/cdebudget', CdeBudgetController.post)
 
 module.exports = routes
