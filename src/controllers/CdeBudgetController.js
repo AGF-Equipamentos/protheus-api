@@ -20,7 +20,8 @@ module.exports = {
       cnpj_client,
       branch,
       from_number,
-      to_number
+      to_number,
+      env = 'test'
     } = req.query
     console.log(req.query)
 
@@ -71,7 +72,10 @@ module.exports = {
       console.log('client_table', client_table)
 
       const api = axios.create({
-        baseURL: process.env.PROTHEUS_API
+        baseURL:
+          env === 'producao'
+            ? process.env.PROTHEUS_API
+            : process.env.PROTHEUS_API_TEST
       })
 
       const {
