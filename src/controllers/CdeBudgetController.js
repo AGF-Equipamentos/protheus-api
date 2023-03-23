@@ -23,7 +23,7 @@ module.exports = {
       to_number,
       env = 'test'
     } = req.query
-    console.log(req.query)
+    console.log('req.query', req.query)
 
     let cnpj_client_condition
     let branch_condition
@@ -40,12 +40,12 @@ module.exports = {
       cnpj_client_condition = ``
     }
 
-    console.log(message)
+    console.log('message', message)
 
     const messageItems = message.split('\n').map((item) => item.split(';'))
     const budgetCodes = messageItems.map((item) => ({ id: item[0] }))
 
-    console.log(budgetCodes)
+    console.log('budgetCodes', budgetCodes)
 
     try {
       const client_data = await request.query(
@@ -64,7 +64,7 @@ module.exports = {
 
             `
       )
-      console.log(client_data.recordsets[0][0])
+      console.log('client_data.recordsets[0][0]', client_data.recordsets[0][0])
 
       const client_code = client_data.recordsets[0][0].client_code
       const client_table = client_data.recordsets[0][0].client_table
