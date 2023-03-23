@@ -180,6 +180,7 @@ module.exports = {
       await updatePdfToS3()
 
       console.log(
+        'link_aws',
         `https://${process.env.AWS_BUCKET_NAME}.s3.amazonaws.com/${filename}.pdf`
       )
 
@@ -203,9 +204,7 @@ module.exports = {
         mediaUrl: `https://${process.env.AWS_BUCKET_NAME}.s3.amazonaws.com/${filename}.pdf`
       })
     } catch (err) {
-      // console.log('budget', err)
-      console.log(err?.response?.status)
-      console.log(err?.response?.data)
+      console.log('err', err)
 
       if (from_number && to_number) {
         if (err?.response?.status === 503) {
