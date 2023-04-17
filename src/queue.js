@@ -1,4 +1,5 @@
 require('dotenv').config()
+require('./database')
 
 const Queue = require('./lib/Queue')
 
