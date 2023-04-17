@@ -2,7 +2,7 @@ const sql = require('mssql')
 const { setRedis } = require('../utils/redis/setRedis')
 
 module.exports = {
-  key: 'UpdateMargin',
+  key: 'CacheMarginQuery',
   options: {
     repeat: { cron: '0 */3 * * *' }
   },
@@ -36,6 +36,7 @@ module.exports = {
         async function (err, recordset) {
           if (err) {
             console.log(err)
+
             reject('Error')
             return
           }
@@ -45,6 +46,7 @@ module.exports = {
             recordset.recordsets[0],
             60 * 60 * 24 // 1 day
           )
+
           resolse('Success')
         }
       )
