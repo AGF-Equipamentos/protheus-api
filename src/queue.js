@@ -3,7 +3,7 @@ require('./database')
 
 const Queue = require('./lib/Queue')
 
-Queue.add('UpdateMargin', {
+Queue.add('CacheMarginQuery', {
   filial_condition: 'F2_FILIAL IN (0101,0102) AND',
   produto_condition: '',
   grupo_condition: '',
