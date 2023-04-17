@@ -10,6 +10,7 @@
     "dev:server": "nodemon src/server.js",
     "dev:queue": "nodemon src/queue.js",
     "serve": "pm2 start ecosystem.config.js",
+    "serve:queue": "pm2 start queue.ecosystem.config.js",
     "servedev": "pm2 start src/server.js --watch",
     "lint": "eslint src --fix --max-warnings=0",
     "test": "jest"
