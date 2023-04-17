@@ -55,6 +55,29 @@ module.exports = {
       devolution_condition = ``
     }
 
+    console.log(`
+    SELECT
+    RTRIM(D2_COD) AS PRODUTO,
+    RTRIM(B1_DESC) AS DESCRICAO,
+    D2_TOTAL AS VALOR,
+    ANO,
+    MES,
+    MARGEM,
+    D2_QUANT AS QTD
+
+    FROM    FATURAMENTO WITH (NOLOCK)
+
+    WHERE   ${filial_condition}
+    ${produto_condition}
+    ${grupo_condition}
+    ${ano_condition}
+    ${mes_condition}
+    ${devolution_condition}
+    (F4_DUPLIC = 'S')
+
+    ORDER BY D2_COD
+    `)
+
     const redisResponse = await getRedis(req.query)
 
     if (redisResponse) {

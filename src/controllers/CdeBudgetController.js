@@ -43,7 +43,9 @@ module.exports = {
     console.log('message', message)
 
     const messageItems = message.split('\n').map((item) => item.split(';'))
-    const budgetCodes = messageItems.map((item) => ({ id: item[0] }))
+    const budgetCodes = messageItems.map((item) => ({
+      id: item[0].toUpperCase()
+    }))
 
     console.log('budgetCodes', budgetCodes)
 
