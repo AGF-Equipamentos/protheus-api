@@ -1,7 +1,6 @@
-const Queue = require('./lib/Queue')
-
 require('dotenv').config()
-require('./database')
+
+const Queue = require('./lib/Queue')
 
 Queue.add('UpdateMargin', {
   filial_condition: 'F2_FILIAL IN (0101,0102) AND',
@@ -11,4 +10,5 @@ Queue.add('UpdateMargin', {
   mes_condition: '',
   devolution_condition: 'VALOR_LIQUIDO_NF > 0 AND'
 })
+
 Queue.process()
