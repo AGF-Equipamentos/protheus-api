@@ -38,7 +38,7 @@ jobs:
         username: ${{ secrets.SSH_USER }}
         port: ${{ secrets.SSH_PORT }}
         password: ${{ secrets.SSH_PASS }}
-        source: ".,!node_modules"
+        source: "."
         target: "~/app/protheus-api"
 
     - name: Run production scripts

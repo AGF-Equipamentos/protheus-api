@@ -1,8 +1,10 @@
 const { Redis } = require('ioredis')
 
-const redisClient = new Redis(
-  process.env.REDIS_PORT || 6379,
-  process.env.REDIS_HOST || 'localhost'
-)
+const redisConfig = {
+  port: process.env.REDIS_PORT || 6379,
+  host: process.env.REDIS_HOST || 'localhost'
+}
 
-module.exports = { redisClient }
+const redisClient = new Redis(redisConfig)
+
+module.exports = { redisClient, redisConfig }
