@@ -52,3 +52,4 @@ jobs:
           cd ~/app/protheus-api
           yarn
           pm2 restart protheus-api
+          pm2 restart protheus-api-queue
