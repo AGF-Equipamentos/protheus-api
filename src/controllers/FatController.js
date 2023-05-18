@@ -1,6 +1,6 @@
 const sql = require('mssql')
-// const { getRedis } = require('../utils/redis/getRedis')
-// const { setRedis } = require('../utils/redis/setRedis')
+const { getRedis } = require('../utils/redis/getRedis')
+const { setRedis } = require('../utils/redis/setRedis')
 
 module.exports = {
   async index(req, res) {
@@ -55,11 +55,11 @@ module.exports = {
       devolution_condition = ``
     }
 
-    // const redisResponse = await getRedis(req.query)
+    const redisResponse = await getRedis(req.query)
 
-    // if (redisResponse) {
-    //   return res.json(redisResponse)
-    // }
+    if (redisResponse) {
+      return res.json(redisResponse)
+    }
 
     // query to the database and get the records
     await request.query(
@@ -95,11 +95,11 @@ module.exports = {
           })
         }
 
-        // await setRedis(
-        //   req.query,
-        //   recordset.recordsets[0],
-        //   60 * 60 * 24 // 1 day
-        // )
+        await setRedis(
+          req.query,
+          recordset.recordsets[0],
+          60 * 60 * 24 // 1 day
+        )
 
         return res.json(recordset.recordsets[0])
         // send records as a response
