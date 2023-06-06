@@ -60,7 +60,7 @@ module.exports = {
                     SB1.B1_EMIN AS PP,
                     SB1.B1_LE AS LE,
                     SB1.B1_UM AS UM,
-                    SB1.B1_ESTSEG AS ESTSEG,
+                    SB1.B1_BASE3 AS FAMILIA,
                     SB1.B1_APROPRI AS APROPRI,
                     CASE WHEN B1_MSBLQL = 1 THEN CAST(1 AS BIT) WHEN B1_MSBLQL = 2 THEN CAST(0 AS BIT) END AS BLOQUEADO
 
