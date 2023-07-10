@@ -100,6 +100,7 @@ module.exports = {
                     SC7.C7_QUJE AS QTD_ENT,
                     SC7.C7_QUANT - SC7.C7_QUJE AS SALDO,
                     SC7.C7_PRECO AS PRECO,
+                    SC7.C7_VLDESC AS DESCONTO,
                     SC7.C7_NUMSC AS NUMSC,
                     RTRIM(SC7.C7_OBS) AS OBS,
                     SC7.C7_FORNECE AS FORN,
