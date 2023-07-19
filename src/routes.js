@@ -19,6 +19,7 @@ const PcGroupedController = require('./controllers/PcGroupedController')
 const BranchContactsController = require('./controllers/BranchContactsController')
 const KardexController = require('./controllers/KardexController')
 const CdeBudgetController = require('./controllers/CdeBudgetController')
+const FatGroupedByStateAndGroupController = require('./controllers/FatGroupedByStateAndGroupController')
 
 routes.get('/estoques', EstoqueController.index)
 routes.get('/pcs', PCsController.index)
@@ -38,5 +39,6 @@ routes.get('/purchases-grouped', PcGroupedController.index)
 routes.get('/branch-contacts', BranchContactsController.index)
 routes.get('/kardex', KardexController.index)
 routes.get('/cdebudget', CdeBudgetController.index)
+routes.get('/groupfat', FatGroupedByStateAndGroupController.index)
 
 module.exports = routes
