@@ -4,14 +4,28 @@ module.exports = {
   async index(req, res) {
     const request = new sql.Request()
 
-    const { filial } = req.query
+    const { filial, cnpj, company_name } = req.query
 
     let filial_condition
+    let cnpj_condition
+    let company_name_condition
 
     if (filial != null) {
       filial_condition = `SA1.A1_FILIAL IN ('${filial}') AND`
     } else {
       filial_condition = ``
+    }
+
+    if (cnpj != null) {
+      cnpj_condition = `SA1.A1_CGC = '${cnpj}' AND`
+    } else {
+      cnpj_condition = ``
+    }
+
+    if (company_name != null) {
+      company_name_condition = `SA1.A1_NOME = '${company_name}' AND`
+    } else {
+      company_name_condition = ``
     }
 
     // query to the database and get the records
@@ -35,7 +49,9 @@ module.exports = {
 
             FROM    SA1010 AS SA1 WITH (NOLOCK)
 
-            WHERE
+            WHERE   
+                    ${company_name_condition}
+                    ${cnpj_condition}
                     ${filial_condition}
                     SA1.A1_MSBLQL <> 1 AND
                     SA1.D_E_L_E_T_ = ''
