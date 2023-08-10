@@ -100,6 +100,10 @@ module.exports = {
                     SC7.C7_QUJE AS QTD_ENT,
                     SC7.C7_QUANT - SC7.C7_QUJE AS SALDO,
                     SC7.C7_PRECO AS PRECO,
+                    SC7.C7_MOEDA AS MOEDA,
+                    CTO.CTO_DESC AS DESC_MOEDA,
+                    SC7.C7_COND AS COND_PAGTO,
+                    SE4.E4_DESCRI AS DESC_PAGTO,
                     SC7.C7_VLDESC AS DESCONTO,
                     SC7.C7_NUMSC AS NUMSC,
                     RTRIM(SC7.C7_OBS) AS OBS,
@@ -114,6 +118,8 @@ module.exports = {
 
             FROM	  SC7010 AS SC7 WITH (NOLOCK) INNER JOIN
                     SB1010 AS SB1 WITH (NOLOCK) ON SB1.D_E_L_E_T_ = '' AND SB1.B1_FILIAL = LEFT('${filial}', 2) AND SB1.B1_COD = SC7.C7_PRODUTO LEFT OUTER JOIN
+                    CTO010 AS CTO WITH (NOLOCK) ON LEFT(SC7.C7_FILIAL, 2) = LEFT(CTO.CTO_FILIAL, 2) AND SC7.C7_MOEDA = CTO.CTO_MOEDA LEFT OUTER JOIN
+                    SE4010 AS SE4 WITH (NOLOCK) ON LEFT(SC7.C7_FILIAL, 2) = LEFT(SE4.E4_FILIAL, 2) AND SC7.C7_COND = SE4.E4_CODIGO LEFT OUTER JOIN
                     SA2010 AS SA2 WITH (NOLOCK) ON SA2.D_E_L_E_T_ = '' AND SA2.A2_FILIAL = LEFT('${filial}', 2) AND SA2.A2_COD = SC7.C7_FORNECE  AND SC7.C7_LOJA = SA2.A2_LOJA
 
             WHERE	  ${pc_condition}
