@@ -96,6 +96,7 @@ module.exports = {
                     RTRIM(SC7.C7_PRODUTO) AS PRODUTO,
                     RTRIM(SC7.C7_DESCRI) AS DESCRICAO,
                     SC7.C7_UM AS UM,
+                    SC7.C7_CC AS CENTRO_CUSTO,
                     CTT.CTT_DESC01 AS DESC_CENTRO_CUSTO,
                     SC7.C7_QUANT AS QTD,
                     SC7.C7_QUJE AS QTD_ENT,
