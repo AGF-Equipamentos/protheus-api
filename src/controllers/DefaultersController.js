@@ -6,19 +6,15 @@ module.exports = {
     const resquest = new sql.Request()
 
     const {
-      filial = "0101','0102','0103", //'0101', '0102', '0103',
-      tipo = "CH','NF", //'CH','NF'
+      filial = "0101','0102','0103",
+      tipo = "CH','NF",
       data_inicio = new Date(2000, 0, 1),
       data_fim = format(
         new Date(subHours(subDays(new Date(), 1)), 3),
         'yyyyMMdd'
       )
     } = req.query
-    console.log(new Date('2023-08-22'))
-    console.log(new Date(2023, 7, 22, 23))
-    console.log(subHours(new Date(), 3))
-    // 23h
-    // console.log(data_fim.replaceAll('-', ''))
+
     let filial_condition
     let tipo_condition
 
@@ -70,7 +66,6 @@ module.exports = {
             }
           })
         }
-        console.log(recordset.recordsets[0].length)
         return res.json(recordset.recordsets[0])
       }
     )
