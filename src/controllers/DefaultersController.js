@@ -10,7 +10,7 @@ module.exports = {
       tipo = "CH','NF",
       data_inicio = new Date(2000, 0, 1),
       data_fim = format(
-        new Date(subHours(subDays(new Date(), 1)), 3),
+        new Date(subHours(subDays(new Date(), 2)), 3),
         'yyyyMMdd'
       )
     } = req.query
