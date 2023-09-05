@@ -102,6 +102,7 @@ module.exports = {
                     SC7.C7_QUJE AS QTD_ENT,
                     SC7.C7_QUANT - SC7.C7_QUJE AS SALDO,
                     SC7.C7_PRECO AS PRECO,
+                    SC7.C7_VALFRE AS FRETE,
                     SC7.C7_MOEDA AS MOEDA,
                     CTO.CTO_DESC AS DESC_MOEDA,
                     SC7.C7_COND AS COND_PAGTO,
