@@ -220,7 +220,7 @@ module.exports = {
               obj.GRUPO === arr[i - 1].GRUPO &&
               obj.VENDEDOR === arr[i - 1].VENDEDOR
             ) {
-              const limite = Math.max(i - 12, 0)
+              const limite = Math.max(i - 11, 0)
 
               // Soma o valor do FAT dos registros anteriores do mesmo GRUPO e VENDEDOR
               for (let j = i - 1; j >= limite; j--) {
