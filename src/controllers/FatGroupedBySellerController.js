@@ -79,6 +79,47 @@ module.exports = {
           AND A3_NOME IS NOT NULL
         GROUP BY ANO, MES, A3_NOME, BM_DESC
 
+        UNION ALL
+
+        SELECT SUM(D2_TOTAL) AS FAT, ANO, MES, 'PEÇAS' AS GRUPO, A3_NOME
+        FROM (
+          SELECT FAT.D2_TOTAL, ANO, MES, SA3.A3_NOME, NF_ORIG, FAT.F2_FILIAL, FAT.F4_DUPLIC
+          FROM FATURAMENTO AS FAT WITH (NOLOCK)
+          INNER JOIN SF2010 AS SF2 ON FAT.NF_ORIG = SF2.F2_DOC
+          INNER JOIN SA3010 AS SA3 ON SF2.F2_VEND1 = SA3.A3_COD
+          WHERE B1_GRUPO IN (${piecesGroups.join(',')})
+        ) AS FATURAMENTO
+        WHERE
+          ${year_condition}
+          ${branch_condition}
+          F4_DUPLIC = 'S'
+          AND D2_TOTAL < 0
+          AND A3_NOME IS NOT NULL
+        GROUP BY ANO, MES, A3_NOME
+
+        UNION ALL
+
+        SELECT
+          SUM(D2_TOTAL) AS FAT,
+          ANO,
+          MES,
+          RTRIM(BM_DESC) AS GRUPO,
+          A3_NOME
+        FROM (
+          SELECT FAT.D2_TOTAL, ANO, MES, SA3.A3_NOME, FAT.F2_FILIAL, FAT.F4_DUPLIC, FAT.BM_DESC
+          FROM FATURAMENTO AS FAT WITH (NOLOCK)
+          INNER JOIN SF2010 AS SF2 ON FAT.NF_ORIG = SF2.F2_DOC
+          INNER JOIN SA3010 AS SA3 ON SF2.F2_VEND1 = SA3.A3_COD
+          WHERE B1_GRUPO NOT IN (${piecesGroups.join(',')})
+          ) AS FATURAMENTO
+        WHERE
+          ${year_condition}
+          ${branch_condition}
+          F4_DUPLIC = 'S'
+          AND D2_TOTAL > 0
+          AND A3_NOME IS NOT NULL
+        GROUP BY ANO, MES, A3_NOME, BM_DESC
+
       ) FATURAMENTO
       ORDER BY
         A3_NOME,
