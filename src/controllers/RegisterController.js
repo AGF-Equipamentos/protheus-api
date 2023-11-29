@@ -63,6 +63,7 @@ module.exports = {
                     SB1.B1_BASE3 AS FAMILIA,
                     SB1.B1_APROPRI AS APROPRI,
                     SB1.B1_TIPO AS TIPO,
+                    SB1.B1_POSIPI AS NCM,
                     CASE WHEN B1_MSBLQL = 1 THEN CAST(1 AS BIT) WHEN B1_MSBLQL = 2 THEN CAST(0 AS BIT) END AS BLOQUEADO
 
             FROM	  SB1010 AS SB1 WITH (NOLOCK)
