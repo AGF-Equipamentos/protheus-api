@@ -17,14 +17,14 @@ module.exports = {
 
     const {
       message = 'TEST-0002;3\nJOSE-002;5\nTEST-0003;2',
-      cnpj_client,
+      cnpj_client: raw_cnpj = '',
       branch,
       from_number,
       to_number,
       paymentCondition = '006',
       env = 'test'
     } = req.query
-    console.log('req.query', req.query)
+    const cnpj_client = raw_cnpj.replace(/[^0-9]/g, '')
 
     let cnpj_client_condition
     let branch_condition
@@ -122,8 +122,6 @@ module.exports = {
 
       console.log(budgetPriceTable)
 
-      // return res.json({ ok: true })
-
       const api = axios.create({
         baseURL:
           env === 'producao'
@@ -150,12 +148,22 @@ module.exports = {
         params: {
           userlog: '000001',
           company: '01',
-          branch: '0201'
+          branch
         },
         data: {
           part_number: budgetCodes
         }
       })
+
+      if (partNumbersData.status.descricao === 'Nenhum registro encontrado.') {
+        res.status(404)
+        return res.json({
+          error: {
+            message: 'Product not found'
+          }
+        })
+      }
+      // return res.json({ ok: true })
 
       const partNumbers = partNumbersData.data.produto
 

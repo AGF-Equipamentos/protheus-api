@@ -4,7 +4,9 @@ module.exports = {
   async index(req, res) {
     const request = new sql.Request()
 
-    const { filial, cnpj, company_name } = req.query
+    const { filial, cnpj: raw_cnpj, company_name } = req.query
+
+    const cnpj = raw_cnpj.replace(/[^0-9]/g, '')
 
     let filial_condition
     let cnpj_condition
@@ -49,7 +51,7 @@ module.exports = {
 
             FROM    SA1010 AS SA1 WITH (NOLOCK)
 
-            WHERE   
+            WHERE
                     ${company_name_condition}
                     ${cnpj_condition}
                     ${filial_condition}
