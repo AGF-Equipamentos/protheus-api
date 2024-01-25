@@ -279,7 +279,7 @@ module.exports = {
         } else {
           await client.messages
             .create({
-              body: 'Houve um erro, por favor tente novamente',
+              body: 'Houve um erro ao gerar o orçamento, consulte o suporte para mais informações.',
               from: from_number,
               to: to_number
             })
