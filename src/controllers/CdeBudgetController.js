@@ -21,6 +21,7 @@ module.exports = {
       branch,
       from_number,
       to_number,
+      paymentCondition = '006',
       env = 'test'
     } = req.query
     console.log('req.query', req.query)
@@ -54,7 +55,8 @@ module.exports = {
         `
             SELECT
                     RTRIM(SA1.A1_COD) AS client_code,
-                    RTRIM(SA1.A1_TABELA) AS client_table
+                    RTRIM(SA1.A1_TABELA) AS client_table,
+                    RTRIM(SA1.A1_EST) AS clientState
 
             FROM    SA1010 AS SA1 WITH (NOLOCK)
 
@@ -69,9 +71,58 @@ module.exports = {
       console.log('client_data.recordsets[0][0]', client_data.recordsets[0][0])
 
       const client_code = client_data.recordsets[0][0].client_code
-      const client_table = client_data.recordsets[0][0].client_table
+      const client_table = client_data.recordsets[0][0].client_table || '007'
+      const clientState = client_data.recordsets[0][0].clientState
       console.log('client_code', client_code)
       console.log('client_table', client_table)
+
+      const branchStateQuery = await request.query(
+        `
+        select M0_ESTENT as state
+        from SYS_COMPANY
+        where M0_CODFIL = ${branch}
+            `
+      )
+
+      const branchState = branchStateQuery.recordsets[0][0].state
+
+      let budgetPriceTable = client_table
+
+      const tablesAssociation = [
+        {
+          innerState: '003',
+          outState: '017'
+        },
+        {
+          innerState: '007',
+          outState: '025'
+        },
+        {
+          innerState: '016',
+          outState: '028'
+        }
+      ]
+
+      const clientTableAssociation = tablesAssociation.find(
+        (tableAssociation) => {
+          return (
+            tableAssociation.innerState === client_table ||
+            tableAssociation.outState === client_table
+          )
+        }
+      )
+
+      console.log(clientTableAssociation)
+
+      if (branchState === clientState) {
+        budgetPriceTable = clientTableAssociation.innerState
+      } else {
+        budgetPriceTable = clientTableAssociation.outState
+      }
+
+      console.log(budgetPriceTable)
+
+      // return res.json({ ok: true })
 
       const api = axios.create({
         baseURL:
@@ -128,11 +179,11 @@ module.exports = {
             {
               codigo_cliente: client_code,
               loja_cliente: '01',
-              condicao_pagamento: '006',
+              condicao_pagamento: paymentCondition,
               natureza_financeira: '10102',
               vendedor1: '000000',
               supervisor: '',
-              tabela: client_table === '' ? '007' : client_table,
+              tabela: budgetPriceTable,
               itens: budgetItems
             }
           ]
@@ -212,7 +263,7 @@ module.exports = {
         if (err?.response?.status === 503) {
           await client.messages
             .create({
-              body: 'O nosso serviço está indisponivel no momento, por favor tente mais tarde',
+              body: 'O nosso serviço está indisponível no momento, por favor tente mais tarde',
               from: from_number,
               to: to_number
             })
