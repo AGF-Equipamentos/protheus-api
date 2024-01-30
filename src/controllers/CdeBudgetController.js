@@ -56,7 +56,8 @@ module.exports = {
             SELECT
                     RTRIM(SA1.A1_COD) AS client_code,
                     RTRIM(SA1.A1_TABELA) AS client_table,
-                    RTRIM(SA1.A1_EST) AS clientState
+                    RTRIM(SA1.A1_EST) AS clientState,
+                    RTRIM(SA1.A1_LOJA) AS clientStore
 
             FROM    SA1010 AS SA1 WITH (NOLOCK)
 
@@ -73,6 +74,7 @@ module.exports = {
       const client_code = client_data.recordsets[0][0].client_code
       const client_table = client_data.recordsets[0][0].client_table || '007'
       const clientState = client_data.recordsets[0][0].clientState
+      const clientStore = client_data.recordsets[0][0].clientStore
       console.log('client_code', client_code)
       console.log('client_table', client_table)
 
@@ -186,7 +188,7 @@ module.exports = {
           orcamento: [
             {
               codigo_cliente: client_code,
-              loja_cliente: '01',
+              loja_cliente: clientStore,
               condicao_pagamento: paymentCondition,
               natureza_financeira: '10102',
               vendedor1: '000000',
