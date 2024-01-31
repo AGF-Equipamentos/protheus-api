@@ -51,6 +51,10 @@ module.exports = {
     }))
 
     console.log('budgetCodes', budgetCodes)
+    Sentry.setContext('budget', {
+      message,
+      budgetCodes: JSON.stringify(budgetCodes)
+    })
 
     try {
       const client_data = await request.query(
@@ -79,6 +83,10 @@ module.exports = {
       const clientStore = client_data.recordsets[0][0].clientStore
       console.log('client_code', client_code)
       console.log('client_table', client_table)
+
+      Sentry.setContext('clientData', {
+        clientData: client_data.recordsets[0][0]
+      })
 
       const branchStateQuery = await request.query(
         `
@@ -126,6 +134,11 @@ module.exports = {
 
       console.log(budgetPriceTable)
 
+      Sentry.setContext('table', {
+        clientTableAssociation,
+        budgetPriceTable
+      })
+
       const api = axios.create({
         baseURL:
           env === 'producao'
@@ -142,7 +155,6 @@ module.exports = {
           password: process.env.PROTHEUS_LOGIN_PASSWORD
         }
       })
-      console.log('access_token', access_token)
 
       if (access_token) {
         api.defaults.headers.authorization = `Bearer ${access_token}`
@@ -167,7 +179,6 @@ module.exports = {
           }
         })
       }
-      // return res.json({ ok: true })
 
       const partNumbers = partNumbersData.data.produto
 
@@ -190,7 +201,7 @@ module.exports = {
           orcamento: [
             {
               codigo_cliente: client_code,
-              loja_cliente: clientStore,
+              loja_cliente: 'clientStore',
               condicao_pagamento: paymentCondition,
               natureza_financeira: '10102',
               vendedor1: '000000',
@@ -207,11 +218,14 @@ module.exports = {
           }
         }
       )
-      console.log(budget.status.status !== 201)
 
       if (budget.status.status !== 201) {
         throw new Error('Error on generating budget')
       }
+
+      Sentry.setContext('budgetResponse', {
+        budget: JSON.stringify(budget)
+      })
 
       // Initialize S3 Client
       const s3Client = new S3Client({
@@ -253,6 +267,10 @@ module.exports = {
         'link_aws',
         `https://${process.env.AWS_BUCKET_NAME}.s3.amazonaws.com/${filename}.pdf`
       )
+
+      Sentry.setContext('budget', {
+        linkAws: `https://${process.env.AWS_BUCKET_NAME}.s3.amazonaws.com/${filename}.pdf`
+      })
 
       // Send a message via whatsapp with the pdf
       if (from_number && to_number) {
@@ -298,16 +316,12 @@ module.exports = {
         }
       }
 
-      // Sentry.addBreadcrumb({
-      //   category: 'cde_budget',
-      //   message,
-      //   budgetCodes
-      // })
       Sentry.captureException(err)
 
       res.status(err?.response?.status || 400)
       return res.json({
         error: {
+          error: err.message,
           message: err?.response?.data?.message,
           log: err
         }
