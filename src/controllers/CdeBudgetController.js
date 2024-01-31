@@ -201,7 +201,7 @@ module.exports = {
           orcamento: [
             {
               codigo_cliente: client_code,
-              loja_cliente: 'clientStore',
+              loja_cliente: clientStore,
               condicao_pagamento: paymentCondition,
               natureza_financeira: '10102',
               vendedor1: '000000',
