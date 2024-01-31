@@ -3,7 +3,9 @@ const { PutObjectCommand, S3Client } = require('@aws-sdk/client-s3')
 const crypto = require('crypto')
 const axios = require('axios')
 const twilio = require('twilio')
+const Sentry = require('@sentry/node')
 // const test = require('../../test.json')
+// const Sentry = require('@sentry/node')
 
 module.exports = {
   async index(req, res) {
@@ -188,7 +190,7 @@ module.exports = {
           orcamento: [
             {
               codigo_cliente: client_code,
-              loja_cliente: clientStore,
+              loja_cliente: 'clientStore',
               condicao_pagamento: paymentCondition,
               natureza_financeira: '10102',
               vendedor1: '000000',
@@ -205,6 +207,11 @@ module.exports = {
           }
         }
       )
+      console.log(budget.status.status !== 201)
+
+      if (budget.status.status !== 201) {
+        throw new Error('Error on generating budget')
+      }
 
       // Initialize S3 Client
       const s3Client = new S3Client({
@@ -279,6 +286,8 @@ module.exports = {
             })
             .then((message) => console.log(message.sid))
         } else {
+          // console.log('error')
+          // Sentry.captureException('teste')
           await client.messages
             .create({
               body: 'Houve um erro ao gerar o orçamento, consulte o suporte para mais informações.',
@@ -289,7 +298,14 @@ module.exports = {
         }
       }
 
-      res.status(err?.response?.status || 500)
+      // Sentry.addBreadcrumb({
+      //   category: 'cde_budget',
+      //   message,
+      //   budgetCodes
+      // })
+      Sentry.captureException(err)
+
+      res.status(err?.response?.status || 400)
       return res.json({
         error: {
           message: err?.response?.data?.message,
