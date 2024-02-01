@@ -123,10 +123,9 @@ module.exports = {
         budgetPriceTable = clientTableAssociation.outState
       }
 
-      Sentry.setContext('table', {
+      Sentry.setContext('tableInfo', {
         clientTableAssociation,
-        budgetPriceTable,
-        budgetItems: JSON.stringify(budgetItems)
+        budgetPriceTable
       })
 
       const api = axios.create({
@@ -183,6 +182,12 @@ module.exports = {
           tipo_operacao: '01',
           part_number: partNumber.part_number
         }
+      })
+
+      Sentry.setContext('budgetItems', {
+        budgetCodes: JSON.stringify(budgetCodes),
+        partNumbers: JSON.stringify(partNumbers),
+        budgetItems: JSON.stringify(budgetItems)
       })
 
       const budgetResponse = await api.post(
