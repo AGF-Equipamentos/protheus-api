@@ -195,7 +195,7 @@ module.exports = {
         }
       })
 
-      const { data: budget } = await api.post(
+      const budgetResponse = await api.post(
         '/orcamentovenda',
         {
           orcamento: [
@@ -219,9 +219,12 @@ module.exports = {
         }
       )
 
-      if (budget.status.status !== 201) {
+      console.log(budgetResponse?.status)
+
+      if (budgetResponse?.status !== 201) {
         throw new Error('Error on generating budget')
       }
+      const budget = budgetResponse.data
 
       Sentry.setContext('budgetResponse', {
         budget: JSON.stringify(budget)
