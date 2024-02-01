@@ -4,8 +4,6 @@ const crypto = require('crypto')
 const axios = require('axios')
 const twilio = require('twilio')
 const Sentry = require('@sentry/node')
-// const test = require('../../test.json')
-// const Sentry = require('@sentry/node')
 
 module.exports = {
   async index(req, res) {
@@ -43,17 +41,15 @@ module.exports = {
       cnpj_client_condition = ``
     }
 
-    console.log('message', message)
-
     const messageItems = message.split('\n').map((item) => item.split(';'))
     const budgetCodes = messageItems.map((item) => ({
       id: item[0].toUpperCase()
     }))
 
-    console.log('budgetCodes', budgetCodes)
     Sentry.setContext('budget', {
       message,
-      budgetCodes: JSON.stringify(budgetCodes)
+      budgetCodes: JSON.stringify(budgetCodes),
+      paymentCondition
     })
 
     try {
@@ -75,14 +71,11 @@ module.exports = {
 
             `
       )
-      console.log('client_data.recordsets[0][0]', client_data.recordsets[0][0])
 
       const client_code = client_data.recordsets[0][0].client_code
       const client_table = client_data.recordsets[0][0].client_table || '007'
       const clientState = client_data.recordsets[0][0].clientState
       const clientStore = client_data.recordsets[0][0].clientStore
-      console.log('client_code', client_code)
-      console.log('client_table', client_table)
 
       Sentry.setContext('clientData', {
         clientData: client_data.recordsets[0][0]
@@ -124,19 +117,16 @@ module.exports = {
         }
       )
 
-      console.log(clientTableAssociation)
-
       if (branchState === clientState) {
         budgetPriceTable = clientTableAssociation.innerState
       } else {
         budgetPriceTable = clientTableAssociation.outState
       }
 
-      console.log(budgetPriceTable)
-
       Sentry.setContext('table', {
         clientTableAssociation,
-        budgetPriceTable
+        budgetPriceTable,
+        budgetItems: JSON.stringify(budgetItems)
       })
 
       const api = axios.create({
@@ -219,7 +209,10 @@ module.exports = {
         }
       )
 
-      console.log(budgetResponse?.status)
+      Sentry.setContext('budgetResponse', {
+        budgetStatus: budgetResponse?.status,
+        budget: JSON.stringify(budgetResponse?.data)
+      })
 
       if (budgetResponse?.status !== 201) {
         throw new Error('Error on generating budget')
@@ -239,7 +232,6 @@ module.exports = {
         }
       })
 
-      // const pdfBase64 = test.data.orcamentovenda[1].fileContent
       const pdfBase64 = budget.orcamento.fileContent
 
       const pdf = Buffer.from(pdfBase64, 'base64')
@@ -253,23 +245,10 @@ module.exports = {
       const updatePdfToS3 = async () => {
         // Create an object and upload it to the Amazon S3 bucket.
         const results = await s3Client.send(new PutObjectCommand(params))
-        console.log(
-          'Successfully created ' +
-            params.Key +
-            ' and uploaded it to ' +
-            params.Bucket +
-            '/' +
-            params.Key
-        )
         return results // For unit tests.
       }
 
       await updatePdfToS3()
-
-      console.log(
-        'link_aws',
-        `https://${process.env.AWS_BUCKET_NAME}.s3.amazonaws.com/${filename}.pdf`
-      )
 
       Sentry.setContext('budget', {
         linkAws: `https://${process.env.AWS_BUCKET_NAME}.s3.amazonaws.com/${filename}.pdf`
@@ -277,15 +256,13 @@ module.exports = {
 
       // Send a message via whatsapp with the pdf
       if (from_number && to_number) {
-        await client.messages
-          .create({
-            mediaUrl: [
-              `https://${process.env.AWS_BUCKET_NAME}.s3.amazonaws.com/${filename}.pdf`
-            ],
-            from: from_number,
-            to: to_number
-          })
-          .then((message) => console.log(message.sid))
+        await client.messages.create({
+          mediaUrl: [
+            `https://${process.env.AWS_BUCKET_NAME}.s3.amazonaws.com/${filename}.pdf`
+          ],
+          from: from_number,
+          to: to_number
+        })
       }
 
       // This callback is what is returned in response to this function being invoked.
@@ -295,27 +272,19 @@ module.exports = {
         mediaUrl: `https://${process.env.AWS_BUCKET_NAME}.s3.amazonaws.com/${filename}.pdf`
       })
     } catch (err) {
-      console.log('err', err)
-
       if (from_number && to_number) {
         if (err?.response?.status === 503) {
-          await client.messages
-            .create({
-              body: 'O nosso serviço está indisponível no momento, por favor tente mais tarde',
-              from: from_number,
-              to: to_number
-            })
-            .then((message) => console.log(message.sid))
+          await client.messages.create({
+            body: 'O nosso serviço está indisponível no momento, por favor tente mais tarde',
+            from: from_number,
+            to: to_number
+          })
         } else {
-          // console.log('error')
-          // Sentry.captureException('teste')
-          await client.messages
-            .create({
-              body: 'Houve um erro ao gerar o orçamento, consulte o suporte para mais informações.',
-              from: from_number,
-              to: to_number
-            })
-            .then((message) => console.log(message.sid))
+          await client.messages.create({
+            body: 'Houve um erro ao gerar o orçamento, consulte o suporte para mais informações.',
+            from: from_number,
+            to: to_number
+          })
         }
       }
 
