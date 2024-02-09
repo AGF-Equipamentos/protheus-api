@@ -4,6 +4,7 @@ const crypto = require('crypto')
 const axios = require('axios')
 const twilio = require('twilio')
 const Sentry = require('@sentry/node')
+const Joi = require('joi')
 
 module.exports = {
   async index(req, res) {
@@ -16,7 +17,7 @@ module.exports = {
     )
 
     const {
-      message = 'TEST-0002;3\nJOSE-002;5\nTEST-0003;2',
+      message = '',
       cnpj_client: raw_cnpj = '',
       branch,
       from_number,
@@ -41,10 +42,31 @@ module.exports = {
       cnpj_client_condition = ``
     }
 
-    const messageItems = message.split('\n').map((item) => item.split(';'))
-    const budgetCodes = messageItems.map((item) => ({
-      id: item[0].toUpperCase()
+    const schema = Joi.object({
+      partNumber: Joi.string().required(),
+      qty: Joi.number().min(1).integer().required()
+    })
+
+    const messageItems = message.split('\n').map((item) => ({
+      partNumber: item.split(';')[0].toUpperCase(),
+      qty: Number(item.split(';')[1])
     }))
+    const budgetCodes = messageItems.map((item) => ({
+      id: item.partNumber
+    }))
+
+    messageItems.forEach((item) => {
+      const { error } = schema.validate(item)
+
+      if (error) {
+        res.status(400)
+        return res.json({
+          error: {
+            message: 'The products are not in the correct format'
+          }
+        })
+      }
+    })
 
     Sentry.setContext('budget', {
       message,
@@ -86,7 +108,7 @@ module.exports = {
         select M0_ESTENT as state
         from SYS_COMPANY
         where M0_CODFIL = ${branch}
-            `
+        `
       )
 
       const branchState = branchStateQuery.recordsets[0][0].state
@@ -173,12 +195,12 @@ module.exports = {
 
       const budgetItems = partNumbers.map((partNumber) => {
         const item = messageItems.find(
-          (item) => item[0] === partNumber.part_number
+          (item) => item.partNumber === partNumber.part_number
         )
 
         return {
           produto: partNumber.codigo,
-          quantidade: Number(item[1]),
+          quantidade: item.qty,
           tipo_operacao: '01',
           part_number: partNumber.part_number
         }
@@ -280,13 +302,13 @@ module.exports = {
       if (from_number && to_number) {
         if (err?.response?.status === 503) {
           await client.messages.create({
-            body: 'O nosso serviço está indisponível no momento, por favor tente mais tarde',
+            body: '(ERR003) - O nosso serviço está indisponível no momento, por favor tente mais tarde',
             from: from_number,
             to: to_number
           })
         } else {
           await client.messages.create({
-            body: 'Houve um erro ao gerar o orçamento, consulte o suporte para mais informações.',
+            body: '(ERR004) - Houve um erro ao gerar o orçamento, consulte o suporte para mais informações.',
             from: from_number,
             to: to_number
           })
