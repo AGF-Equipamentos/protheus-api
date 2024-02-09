@@ -42,11 +42,6 @@ module.exports = {
       cnpj_client_condition = ``
     }
 
-    const schema = Joi.object({
-      partNumber: Joi.string().required(),
-      qty: Joi.number().min(1).integer().required()
-    })
-
     const messageItems = message.split('\n').map((item) => ({
       partNumber: item.split(';')[0].toUpperCase(),
       qty: Number(item.split(';')[1])
@@ -55,18 +50,23 @@ module.exports = {
       id: item.partNumber
     }))
 
-    messageItems.forEach((item) => {
-      const { error } = schema.validate(item)
+    const schema = Joi.array().items(
+      Joi.object({
+        partNumber: Joi.string().required(),
+        qty: Joi.number().min(1).integer().required()
+      })
+    )
 
-      if (error) {
-        res.status(400)
-        return res.json({
-          error: {
-            message: 'The products are not in the correct format'
-          }
-        })
-      }
-    })
+    const { error } = schema.validate(messageItems)
+
+    if (error) {
+      res.status(400)
+      return res.json({
+        error: {
+          message: 'The products are not in the correct format'
+        }
+      })
+    }
 
     Sentry.setContext('budget', {
       message,
