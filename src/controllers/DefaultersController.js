@@ -1,9 +1,9 @@
-const { format, subDays, subHours } = require('date-fns')
+const { format, subHours, subDays } = require('date-fns')
 const sql = require('mssql')
 
 module.exports = {
   async index(req, res) {
-    const resquest = new sql.Request()
+    const request = new sql.Request()
 
     const {
       filial = "0101','0102','0103",
@@ -30,7 +30,7 @@ module.exports = {
       tipo_condition = ``
     }
 
-    await resquest.query(
+    await request.query(
       `
         SELECT
           E1_FILIAL AS FILIAL,
@@ -52,8 +52,8 @@ module.exports = {
          E1_SALDO <> 0 AND
          ${filial_condition}
          ${tipo_condition}
-         E1_VENCREA <= ${data_fim.replaceAll('-', '')} AND
-         E1_VENCREA >= ${format(new Date(data_inicio), 'yyyyMMdd')} AND
+         E1_VENCREA <= ${data_fim} AND
+         E1_VENCREA >= ${data_inicio} AND
          D_E_L_E_T_ = ''
       `,
 
