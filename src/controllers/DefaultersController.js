@@ -8,11 +8,8 @@ module.exports = {
     const {
       filial = "0101','0102','0103",
       tipo = "CH','NF",
-      data_inicio = new Date(2000, 0, 1),
-      data_fim = format(
-        new Date(subHours(subDays(new Date(), 2)), 3),
-        'yyyyMMdd'
-      )
+      data_inicio = format(new Date(2000, 0, 1), 'yyyyMMdd'),
+      data_fim = format(subHours(subDays(new Date(), 2), 3), 'yyyyMMdd')
     } = req.query
 
     let filial_condition
@@ -40,7 +37,7 @@ module.exports = {
           E1_EMISSAO AS [DATA EMISSÃO],
           E1_VENCREA AS VENCIMENTO,
           E1_CLIENTE AS [COD CLIENTE],
-          E1_NOMCLI AS [NOME CLIENTE],
+          RTRIM(E1_NOMCLI) AS [NOME CLIENTE],
           E1_VALOR AS VALOR, 
           E1_SALDO AS [VALOR PENDENTE],
           DATEDIFF(DAY, E1_VENCREA, GETDATE()) AS DIAS,
