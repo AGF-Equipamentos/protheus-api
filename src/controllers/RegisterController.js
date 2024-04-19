@@ -67,8 +67,15 @@ module.exports = {
                     CASE WHEN B1_MSBLQL = 1 THEN CAST(1 AS BIT) WHEN B1_MSBLQL = 2 THEN CAST(0 AS BIT) END AS BLOQUEADO,
                     COALESCE(SUM(EST_TERC.B6_SALDO), 0) AS SALDO_TERCEIRO
 
-            FROM	  SB1010 AS SB1 WITH (NOLOCK)
-            LEFT JOIN dbo.VW_ESTOQUE_TERCEIRO AS EST_TERC ON LEFT(SB1.B1_FILIAL, 2) = LEFT(EST_TERC.B6_FILIAL, 2) AND SB1.B1_COD = EST_TERC.B6_PRODUTO
+            FROM	  SB1010 AS SB1 WITH (NOLOCK) LEFT JOIN 
+                      (SELECT 
+                          B6_FILIAL,
+                          B6_PRODUTO,
+                          B6_TIPO,
+                          B6_SALDO
+                      FROM dbo.VW_ESTOQUE_TERCEIRO
+                      WHERE (B6_TIPO = 'E')) AS EST_TERC ON LEFT(SB1.B1_FILIAL, 2) = LEFT(EST_TERC.B6_FILIAL, 2) AND
+                      SB1.B1_COD = EST_TERC.B6_PRODUTO
 
             WHERE	  ${produto_condition}
                     ${busca_cod_produto_condition}
