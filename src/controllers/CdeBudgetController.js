@@ -173,44 +173,93 @@ module.exports = {
         api.defaults.headers.authorization = `Bearer ${access_token}`
       }
 
-      const { data: partNumbersData } = await api.get('partnumber', {
-        params: {
-          userlog: '000001',
-          company: '01',
-          branch
-        },
-        data: {
-          part_number: budgetCodes
-        }
-      })
+      const budgetItems = []
 
-      if (partNumbersData.status.descricao === 'Nenhum registro encontrado.') {
-        res.status(404)
-        return res.json({
-          error: {
-            message: 'Product not found'
-          }
+      const partNumberProtheusData = await request.query(
+        `
+            SELECT
+                    RTRIM(SB1.B1_COD) AS part_number,
+                    RTRIM(SB1.B1_COD) AS codigo
+            FROM    SB1010 AS SB1 WITH (NOLOCK)
+            WHERE
+                    SB1.B1_COD IN ('${budgetCodes
+                      .map((budget) => budget.id)
+                      .join(`','`)}') AND
+                    SB1.B1_FILIAL IN ('${branch.slice(0, 2)}') AND
+                    SB1.D_E_L_E_T_ = ''
+            `
+      )
+
+      const partNumberProtheus = partNumberProtheusData.recordsets[0]
+
+      if (partNumberProtheus.length > 0) {
+        partNumberProtheus.forEach((partNumber) => {
+          const item = messageItems.find(
+            (item) => item.partNumber === partNumber.part_number
+          )
+
+          budgetItems.push({
+            produto: partNumber.codigo,
+            quantidade: item.qty,
+            tipo_operacao: '01',
+            part_number: partNumber.part_number
+          })
         })
       }
 
-      const partNumbers = partNumbersData.data.produto
+      if (messageItems.length !== budgetItems.length) {
+        const { data: partNumbersData } = await api.get('partnumber', {
+          params: {
+            userlog: '000001',
+            company: '01',
+            branch
+          },
+          data: {
+            part_number: budgetCodes
+          }
+        })
 
-      const budgetItems = partNumbers.map((partNumber) => {
-        const item = messageItems.find(
-          (item) => item.partNumber === partNumber.part_number
-        )
+        const partNumbersFound =
+          partNumbersData.status.descricao !== 'Nenhum registro encontrado.'
 
-        return {
-          produto: partNumber.codigo,
-          quantidade: item.qty,
-          tipo_operacao: '01',
-          part_number: partNumber.part_number
+        if (partNumberProtheus.length === 0 && !partNumbersFound) {
+          res.status(404)
+          return res.json({
+            error: {
+              message: 'Product not found'
+            }
+          })
         }
-      })
+
+        if (partNumbersFound) {
+          partNumbersData.data.produto.forEach((partNumber) => {
+            const item = messageItems.find(
+              (item) => item.partNumber === partNumber.part_number
+            )
+
+            const itemAlreadyFoundInProtheus = budgetItems.find(
+              (item) => item.part_number === partNumber.part_number
+            )
+
+            if (!itemAlreadyFoundInProtheus) {
+              budgetItems.push({
+                produto: partNumber.codigo,
+                quantidade: item.qty,
+                tipo_operacao: '01',
+                part_number: partNumber.part_number
+              })
+            }
+          })
+        }
+
+        Sentry.setContext('partNumbers', {
+          partNumbers: JSON.stringify(partNumbersData.data)
+        })
+      }
 
       Sentry.setContext('budgetItems', {
         budgetCodes: JSON.stringify(budgetCodes),
-        partNumbers: JSON.stringify(partNumbers),
+        partNumberProtheus: JSON.stringify(partNumberProtheus),
         budgetItems: JSON.stringify(budgetItems)
       })
 
