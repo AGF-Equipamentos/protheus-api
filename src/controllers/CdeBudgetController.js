@@ -193,17 +193,19 @@ module.exports = {
       const partNumberProtheus = partNumberProtheusData.recordsets[0]
 
       if (partNumberProtheus.length > 0) {
-        partNumberProtheus.forEach((partNumber) => {
-          const item = messageItems.find(
-            (item) => item.partNumber === partNumber.part_number
+        messageItems.forEach((item) => {
+          const partNumber = partNumberProtheus.find(
+            (partNumber) => partNumber.part_number === item.partNumber
           )
 
-          budgetItems.push({
-            produto: partNumber.codigo,
-            quantidade: item.qty,
-            tipo_operacao: '01',
-            part_number: partNumber.part_number
-          })
+          if (partNumber) {
+            budgetItems.push({
+              produto: partNumber.codigo,
+              quantidade: item.qty,
+              tipo_operacao: '01',
+              part_number: partNumber.part_number
+            })
+          }
         })
       }
 
@@ -232,16 +234,16 @@ module.exports = {
         }
 
         if (partNumbersFound) {
-          partNumbersData.data.produto.forEach((partNumber) => {
-            const item = messageItems.find(
-              (item) => item.partNumber === partNumber.part_number
+          messageItems.forEach((item) => {
+            const partNumber = partNumbersData.data.produto.find(
+              (partNumber) => partNumber.part_number === item.partNumber
             )
 
             const itemAlreadyFoundInProtheus = budgetItems.find(
-              (item) => item.part_number === partNumber.part_number
+              (budgetItem) => budgetItem.produto === item.partNumber
             )
 
-            if (!itemAlreadyFoundInProtheus) {
+            if (!itemAlreadyFoundInProtheus && partNumber) {
               budgetItems.push({
                 produto: partNumber.codigo,
                 quantidade: item.qty,
@@ -263,6 +265,7 @@ module.exports = {
         budgetItems: JSON.stringify(budgetItems)
       })
 
+      console.log(budgetItems)
       const budgetResponse = await api.post(
         '/orcamentovenda',
         {
