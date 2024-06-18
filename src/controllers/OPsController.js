@@ -4,10 +4,12 @@ module.exports = {
   async index(req, res) {
     const request = new sql.Request()
 
-    const { filial, obs, produto, opnumber, fechado, ano, mes } = req.query
+    const { filial, obs, produto, grupo, opnumber, fechado, ano, mes } =
+      req.query
 
     let produto_condition
     let filial_condition
+    let grupo_condition
     let obs_condition
     let opnumber_condition
     let fechado_condition
@@ -24,6 +26,12 @@ module.exports = {
       filial_condition = `SC2.C2_FILIAL IN (${filial}) AND`
     } else {
       filial_condition = ``
+    }
+
+    if (grupo != null) {
+      grupo_condition = `SB1.B1_GRUPO IN (${grupo}) AND`
+    } else {
+      grupo_condition = ``
     }
 
     if (obs != null) {
@@ -88,6 +96,7 @@ module.exports = {
 
             WHERE   ${filial_condition}
                     ${produto_condition}
+                    ${grupo_condition}
                     ${obs_condition}
                     ${opnumber_condition}
                     ${fechado_condition}

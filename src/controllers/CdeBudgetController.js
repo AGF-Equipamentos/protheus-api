@@ -265,7 +265,6 @@ module.exports = {
         budgetItems: JSON.stringify(budgetItems)
       })
 
-      console.log(budgetItems)
       const budgetResponse = await api.post(
         '/orcamentovenda',
         {
