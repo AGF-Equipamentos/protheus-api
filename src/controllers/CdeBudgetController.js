@@ -80,6 +80,7 @@ module.exports = {
             SELECT
                     RTRIM(SA1.A1_COD) AS client_code,
                     RTRIM(SA1.A1_TABELA) AS client_table,
+                    RTRIM(SA1.A1_CONTRIB) AS taxpayer,
                     RTRIM(SA1.A1_EST) AS clientState,
                     RTRIM(SA1.A1_LOJA) AS clientStore,
                     RTRIM(SA1.A1_VEND) AS seller
@@ -97,6 +98,7 @@ module.exports = {
 
       const client_code = client_data.recordsets[0][0].client_code
       const client_table = client_data.recordsets[0][0].client_table || '007'
+      const taxPayer = client_data.recordsets[0][0].taxpayer === '1'
       const clientState = client_data.recordsets[0][0].clientState
       const clientStore = client_data.recordsets[0][0].clientStore
       const seller = client_data.recordsets[0][0].seller
@@ -143,6 +145,8 @@ module.exports = {
 
       if (branchState === clientState) {
         budgetPriceTable = clientTableAssociation.innerState
+      } else if (client_table === '007' && !taxPayer) {
+        budgetPriceTable = '007'
       } else {
         budgetPriceTable = clientTableAssociation.outState
       }
