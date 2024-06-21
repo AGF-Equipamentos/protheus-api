@@ -4,8 +4,18 @@ module.exports = {
   async index(req, res) {
     const request = new sql.Request()
 
-    const { filial, pc, produto, grupo, top, entregue, desc, cnpj, legenda } =
-      req.query
+    const {
+      filial,
+      pc,
+      produto,
+      grupo,
+      top,
+      entregue,
+      desc,
+      cnpj,
+      legenda,
+      fornecedor
+    } = req.query
 
     let filial_condition
     let pc_condition
@@ -16,6 +26,7 @@ module.exports = {
     let desc_condition
     let cnpj_condition
     let legenda_condition
+    let fornecedor_condition
 
     if (filial != null) {
       filial_condition = `SC7.C7_FILIAL IN (${filial}) AND`
@@ -85,6 +96,18 @@ module.exports = {
       legenda_condition = ``
     }
 
+    if (fornecedor != null) {
+      if (typeof fornecedor === 'object') {
+        fornecedor_condition = `SC7.C7_FORNECE NOT IN ('${fornecedor.join(
+          `','`
+        )}') AND`
+      } else {
+        fornecedor_condition = `SC7.C7_FORNECE NOT IN ('${fornecedor}') AND`
+      }
+    } else {
+      fornecedor_condition = ``
+    }
+
     // query to the database and get the records
     await request.query(
       `
@@ -133,6 +156,7 @@ module.exports = {
                     ${entregue_condition}
                     ${cnpj_condition}
                     ${legenda_condition}
+                    ${fornecedor_condition}
                     SC7.C7_RESIDUO = '' AND
                     SC7.D_E_L_E_T_ = ''
 
