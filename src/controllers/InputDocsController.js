@@ -43,6 +43,7 @@ module.exports = {
                     SD1.D1_QUANT AS QTD,
                     SD1.D1_VUNIT AS PRECO,
                     CONCAT(SUBSTRING(SD1.D1_DTDIGIT,7,2),'/',SUBSTRING(SD1.D1_DTDIGIT,5,2),'/',SUBSTRING(SD1.D1_DTDIGIT,1,4)) AS ENTREGUE,
+                    RTRIM(SA2.A2_COD) AS FORN,
                     RTRIM(SA2.A2_NREDUZ) AS DESC_FORN
 
             FROM	  SD1010 AS SD1 WITH (NOLOCK) LEFT OUTER JOIN
