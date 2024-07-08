@@ -9,7 +9,7 @@ module.exports = {
   async handle({ data }) {
     const request = new sql.Request()
 
-    await new Promise((resolse, reject) => {
+    await new Promise((resolve, reject) => {
       request.query(
         `
         SELECT
@@ -42,12 +42,12 @@ module.exports = {
           }
 
           await setRedis(
-            { filial: '0101,0102', ano: '2021,2022,2023', devolution: 'no' },
+            { filial: '0101,0102', ano: '2022,2023,2024', devolution: 'no' },
             recordset.recordsets[0],
             60 * 60 * 24 // 1 day
           )
 
-          resolse('Success')
+          resolve('Success')
         }
       )
     })

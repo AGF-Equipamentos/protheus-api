@@ -3,5 +3,5 @@ module.exports = {
   password: process.env.PROTHEUS_PASSWORD,
   server: process.env.PROTHEUS_SERVER,
   database: process.env.PROTHEUS_DATABASE,
-  requestTimeout: 99999
+  requestTimeout: 1000 * 60 * 5 // 5  minutes
 }
