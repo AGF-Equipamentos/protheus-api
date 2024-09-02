@@ -196,13 +196,6 @@ module.exports = {
 
       const partNumberProtheus = partNumberProtheusData.recordsets[0]
 
-      // const partNumberProtheus = allPartNumberProtheus
-      //   .map((pn) => ({
-      //     ...pn,
-      //     part_number: pn.part_number.replace(/[^a-zA-Z0-9]/g, '')
-      //   }))
-      //   .filter((pn) => budgetCodes.map((bc) => bc.id).includes(pn.part_number))
-
       if (partNumberProtheus.length > 0) {
         messageItems.forEach((item) => {
           const partNumber = partNumberProtheus.find(
@@ -232,17 +225,6 @@ module.exports = {
           id: item.partNumber
         }))
 
-        // const { data: partNumbersData } = await api.get('partnumber', {
-        //   params: {
-        //     userlog: '000001',
-        //     company: '01',
-        //     branch
-        //   },
-        //   data: {
-        //     part_number: budgetCodes
-        //   }
-        // })
-
         const partNumbersData = await request.query(
           `
               SELECT
@@ -258,9 +240,6 @@ module.exports = {
           ...pn,
           part_number: pn.part_number.replace(/[^a-zA-Z0-9]/g, '').toUpperCase()
         }))
-
-        // const partNumbersFound =
-        //   partNumbersData.status.descricao !== 'Nenhum registro encontrado.'
 
         const partNumbersFound = []
         const budgetCodesArray = budgetCodes.map((bg) => bg.id)
@@ -305,9 +284,6 @@ module.exports = {
           partNumbers: JSON.stringify(partNumbersFound)
         })
       }
-
-      // console.log(budgetItems)
-      // return res.json({})
 
       Sentry.setContext('budgetItems', {
         budgetCodes: JSON.stringify(budgetCodes),
