@@ -42,11 +42,11 @@ module.exports = {
       cnpj_client_condition = ``
     }
 
-    const messageItems = message.split('\n').map((item) => ({
+    let messageItems = message.split('\n').map((item) => ({
       partNumber: item.split(';')[0].toUpperCase(),
       qty: Number(item.split(';')[1])
     }))
-    const budgetCodes = messageItems.map((item) => ({
+    let budgetCodes = messageItems.map((item) => ({
       id: item.partNumber
     }))
 
@@ -214,21 +214,43 @@ module.exports = {
       }
 
       if (messageItems.length !== budgetItems.length) {
-        const { data: partNumbersData } = await api.get('partnumber', {
-          params: {
-            userlog: '000001',
-            company: '01',
-            branch
-          },
-          data: {
-            part_number: budgetCodes
+        messageItems = message.split('\n').map((item) => ({
+          partNumber: item
+            .split(';')[0]
+            .replace(/[^a-zA-Z0-9]/g, '')
+            .toUpperCase(),
+          qty: Number(item.split(';')[1])
+        }))
+        budgetCodes = messageItems.map((item) => ({
+          id: item.partNumber
+        }))
+
+        const partNumbersData = await request.query(
+          `
+              SELECT
+                      RTRIM(Z2_PARTNUM) AS part_number,
+                      RTRIM(Z2_PRODUTO) AS codigo
+              FROM    SZ2010 AS SZ2 WITH (NOLOCK)
+              WHERE
+                      Z2_FILIAL IN ('${branch.slice(0, 2)}') AND
+                      D_E_L_E_T_ = ''
+              `
+        )
+        const partNumbers = partNumbersData.recordsets[0].map((pn) => ({
+          ...pn,
+          part_number: pn.part_number.replace(/[^a-zA-Z0-9]/g, '').toUpperCase()
+        }))
+
+        const partNumbersFound = []
+        const budgetCodesArray = budgetCodes.map((bg) => bg.id)
+
+        partNumbers.forEach((pn) => {
+          if (budgetCodesArray.includes(pn.part_number)) {
+            partNumbersFound.push(pn)
           }
         })
 
-        const partNumbersFound =
-          partNumbersData.status.descricao !== 'Nenhum registro encontrado.'
-
-        if (partNumberProtheus.length === 0 && !partNumbersFound) {
+        if (partNumberProtheus.length === 0 && partNumbersFound.length === 0) {
           res.status(404)
           return res.json({
             error: {
@@ -237,9 +259,9 @@ module.exports = {
           })
         }
 
-        if (partNumbersFound) {
+        if (partNumbersFound.length > 0) {
           messageItems.forEach((item) => {
-            const partNumber = partNumbersData.data.produto.find(
+            const partNumber = partNumbersFound.find(
               (partNumber) => partNumber.part_number === item.partNumber
             )
 
@@ -259,7 +281,7 @@ module.exports = {
         }
 
         Sentry.setContext('partNumbers', {
-          partNumbers: JSON.stringify(partNumbersData.data)
+          partNumbers: JSON.stringify(partNumbersFound)
         })
       }
 
