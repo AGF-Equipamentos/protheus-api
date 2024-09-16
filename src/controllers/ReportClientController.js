@@ -56,10 +56,10 @@ module.exports = {
     } else {
       generic_condition = ``
     }
-    console.log('Codigo do vendedor ', cod_seller)
 
     if (cod_seller) {
-      cod_seller_condition = `SA1.A1_VEND = '${cod_seller}' AND`
+      const divideSellerCode = cod_seller.split(';')
+      cod_seller_condition = `SA1.A1_VEND IN (${divideSellerCode}) AND`
     } else {
       cod_seller_condition = ``
     }
@@ -163,6 +163,7 @@ module.exports = {
             SA1.D_E_L_E_T_ = ''
       `)
 
+      // console.log(total.recordset[0].total)
       return res.json({
         data: clients.recordsets[0],
         meta: {
