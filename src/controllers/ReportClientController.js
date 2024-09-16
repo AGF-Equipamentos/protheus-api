@@ -163,7 +163,6 @@ module.exports = {
             SA1.D_E_L_E_T_ = ''
       `)
 
-      // console.log(total.recordset[0].total)
       return res.json({
         data: clients.recordsets[0],
         meta: {
