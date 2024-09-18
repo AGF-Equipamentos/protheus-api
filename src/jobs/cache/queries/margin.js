@@ -13,12 +13,12 @@ module.exports = {
 
     WHERE   F2_FILIAL IN (0101,0102) AND
 
-    ANO IN (2021,2022,2023) AND
+    ANO IN (2022,2023,2024) AND
 
     VALOR_LIQUIDO_NF > 0 AND
     (F4_DUPLIC = 'S')
 
     ORDER BY D2_COD
   `,
-  params: { filial: '0101,0102', ano: '2021,2022,2023', devolution: 'no' }
+  params: { filial: '0101,0102', ano: '2022,2023,2024', devolution: 'no' }
 }

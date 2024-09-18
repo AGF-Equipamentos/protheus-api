@@ -42,11 +42,11 @@ module.exports = {
       cnpj_client_condition = ``
     }
 
-    const messageItems = message.split('\n').map((item) => ({
+    let messageItems = message.split('\n').map((item) => ({
       partNumber: item.split(';')[0].toUpperCase(),
       qty: Number(item.split(';')[1])
     }))
-    const budgetCodes = messageItems.map((item) => ({
+    let budgetCodes = messageItems.map((item) => ({
       id: item.partNumber
     }))
 
@@ -80,8 +80,10 @@ module.exports = {
             SELECT
                     RTRIM(SA1.A1_COD) AS client_code,
                     RTRIM(SA1.A1_TABELA) AS client_table,
+                    RTRIM(SA1.A1_CONTRIB) AS taxpayer,
                     RTRIM(SA1.A1_EST) AS clientState,
-                    RTRIM(SA1.A1_LOJA) AS clientStore
+                    RTRIM(SA1.A1_LOJA) AS clientStore,
+                    RTRIM(SA1.A1_VEND) AS seller
 
             FROM    SA1010 AS SA1 WITH (NOLOCK)
 
@@ -96,8 +98,10 @@ module.exports = {
 
       const client_code = client_data.recordsets[0][0].client_code
       const client_table = client_data.recordsets[0][0].client_table || '007'
+      const taxPayer = client_data.recordsets[0][0].taxpayer === '1'
       const clientState = client_data.recordsets[0][0].clientState
       const clientStore = client_data.recordsets[0][0].clientStore
+      const seller = client_data.recordsets[0][0].seller
 
       Sentry.setContext('clientData', {
         clientData: client_data.recordsets[0][0]
@@ -141,6 +145,8 @@ module.exports = {
 
       if (branchState === clientState) {
         budgetPriceTable = clientTableAssociation.innerState
+      } else if (client_table === '007' && !taxPayer) {
+        budgetPriceTable = '007'
       } else {
         budgetPriceTable = clientTableAssociation.outState
       }
@@ -171,44 +177,117 @@ module.exports = {
         api.defaults.headers.authorization = `Bearer ${access_token}`
       }
 
-      const { data: partNumbersData } = await api.get('partnumber', {
-        params: {
-          userlog: '000001',
-          company: '01',
-          branch
-        },
-        data: {
-          part_number: budgetCodes
-        }
-      })
+      const budgetItems = []
 
-      if (partNumbersData.status.descricao === 'Nenhum registro encontrado.') {
-        res.status(404)
-        return res.json({
-          error: {
-            message: 'Product not found'
+      const partNumberProtheusData = await request.query(
+        `
+            SELECT
+                    RTRIM(SB1.B1_COD) AS part_number,
+                    RTRIM(SB1.B1_COD) AS codigo
+            FROM    SB1010 AS SB1 WITH (NOLOCK)
+            WHERE
+                    SB1.B1_COD IN ('${budgetCodes
+                      .map((budget) => budget.id)
+                      .join(`','`)}') AND
+                    SB1.B1_FILIAL IN ('${branch.slice(0, 2)}') AND
+                    SB1.D_E_L_E_T_ = ''
+            `
+      )
+
+      const partNumberProtheus = partNumberProtheusData.recordsets[0]
+
+      if (partNumberProtheus.length > 0) {
+        messageItems.forEach((item) => {
+          const partNumber = partNumberProtheus.find(
+            (partNumber) => partNumber.part_number === item.partNumber
+          )
+
+          if (partNumber) {
+            budgetItems.push({
+              produto: partNumber.codigo,
+              quantidade: item.qty,
+              tipo_operacao: '01',
+              part_number: partNumber.part_number
+            })
           }
         })
       }
 
-      const partNumbers = partNumbersData.data.produto
+      if (messageItems.length !== budgetItems.length) {
+        messageItems = message.split('\n').map((item) => ({
+          partNumber: item
+            .split(';')[0]
+            .replace(/[^a-zA-Z0-9]/g, '')
+            .toUpperCase(),
+          qty: Number(item.split(';')[1])
+        }))
+        budgetCodes = messageItems.map((item) => ({
+          id: item.partNumber
+        }))
 
-      const budgetItems = partNumbers.map((partNumber) => {
-        const item = messageItems.find(
-          (item) => item.partNumber === partNumber.part_number
+        const partNumbersData = await request.query(
+          `
+              SELECT
+                      RTRIM(Z2_PARTNUM) AS part_number,
+                      RTRIM(Z2_PRODUTO) AS codigo
+              FROM    SZ2010 AS SZ2 WITH (NOLOCK)
+              WHERE
+                      Z2_FILIAL IN ('${branch.slice(0, 2)}') AND
+                      D_E_L_E_T_ = ''
+              `
         )
+        const partNumbers = partNumbersData.recordsets[0].map((pn) => ({
+          ...pn,
+          part_number: pn.part_number.replace(/[^a-zA-Z0-9]/g, '').toUpperCase()
+        }))
 
-        return {
-          produto: partNumber.codigo,
-          quantidade: item.qty,
-          tipo_operacao: '01',
-          part_number: partNumber.part_number
+        const partNumbersFound = []
+        const budgetCodesArray = budgetCodes.map((bg) => bg.id)
+
+        partNumbers.forEach((pn) => {
+          if (budgetCodesArray.includes(pn.part_number)) {
+            partNumbersFound.push(pn)
+          }
+        })
+
+        if (partNumberProtheus.length === 0 && partNumbersFound.length === 0) {
+          res.status(404)
+          return res.json({
+            error: {
+              message: 'Product not found'
+            }
+          })
         }
-      })
+
+        if (partNumbersFound.length > 0) {
+          messageItems.forEach((item) => {
+            const partNumber = partNumbersFound.find(
+              (partNumber) => partNumber.part_number === item.partNumber
+            )
+
+            const itemAlreadyFoundInProtheus = budgetItems.find(
+              (budgetItem) => budgetItem.produto === item.partNumber
+            )
+
+            if (!itemAlreadyFoundInProtheus && partNumber) {
+              budgetItems.push({
+                produto: partNumber.codigo,
+                quantidade: item.qty,
+                tipo_operacao: '01',
+                part_number: partNumber.part_number
+              })
+            }
+          })
+        }
+
+        Sentry.setContext('partNumbers', {
+          partNumbers: JSON.stringify(partNumbersFound)
+        })
+      }
 
       Sentry.setContext('budgetItems', {
         budgetCodes: JSON.stringify(budgetCodes),
-        partNumbers: JSON.stringify(partNumbers),
+        partNumberProtheus: JSON.stringify(partNumberProtheus),
         budgetItems: JSON.stringify(budgetItems)
       })
 
@@ -221,8 +300,9 @@ module.exports = {
               loja_cliente: clientStore,
               condicao_pagamento: paymentCondition,
               natureza_financeira: '10102',
-              vendedor1: '000000',
+              vendedor1: seller !== '' ? seller : '000000',
               supervisor: '',
+              vendedor5: '000000',
               tabela: budgetPriceTable,
               itens: budgetItems
             }

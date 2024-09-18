@@ -64,15 +64,38 @@ module.exports = {
                     SB1.B1_APROPRI AS APROPRI,
                     SB1.B1_TIPO AS TIPO,
                     SB1.B1_POSIPI AS NCM,
-                    CASE WHEN B1_MSBLQL = 1 THEN CAST(1 AS BIT) WHEN B1_MSBLQL = 2 THEN CAST(0 AS BIT) END AS BLOQUEADO
+                    CASE WHEN B1_MSBLQL = 1 THEN CAST(1 AS BIT) WHEN B1_MSBLQL = 2 THEN CAST(0 AS BIT) END AS BLOQUEADO,
+                    COALESCE(SUM(EST_TERC.B6_SALDO), 0) AS SALDO_TERCEIRO
 
-            FROM	  SB1010 AS SB1 WITH (NOLOCK)
+            FROM	  SB1010 AS SB1 WITH (NOLOCK) LEFT JOIN 
+                      (SELECT 
+                          B6_FILIAL,
+                          B6_PRODUTO,
+                          B6_TIPO,
+                          B6_SALDO
+                      FROM dbo.VW_ESTOQUE_TERCEIRO
+                      WHERE (B6_TIPO = 'E')) AS EST_TERC ON LEFT(SB1.B1_FILIAL, 2) = LEFT(EST_TERC.B6_FILIAL, 2) AND
+                      SB1.B1_COD = EST_TERC.B6_PRODUTO
 
             WHERE	  ${produto_condition}
                     ${busca_cod_produto_condition}
                     ${busca_desc_produto_condition}
                     ${filial_condition}
                     SB1.D_E_L_E_T_ = ''
+            
+            GROUP BY
+                    RTRIM(SB1.B1_COD),
+                    RTRIM(SB1.B1_DESC),
+                    RTRIM(SB1.B1_ZZLOCA),
+                    SB1.B1_GRUPO,
+                    SB1.B1_EMIN,
+                    SB1.B1_LE,
+                    SB1.B1_UM,
+                    SB1.B1_BASE3,
+                    SB1.B1_APROPRI,
+                    SB1.B1_TIPO,
+                    SB1.B1_POSIPI,
+                    CASE WHEN B1_MSBLQL = 1 THEN CAST(1 AS BIT) WHEN B1_MSBLQL = 2 THEN CAST(0 AS BIT) END
 
             `,
       function (err, recordset) {
