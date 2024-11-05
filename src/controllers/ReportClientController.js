@@ -6,15 +6,17 @@ module.exports = {
 
     const {
       filial,
-      pagination: paginationRaw = {
-        page: 1,
-        pageSize: 10
-      },
+      pagination: paginationRaw,
       filters: filtersRaw,
       usePagination = 'true'
     } = req.query
 
-    const pagination = JSON.parse(paginationRaw)
+    const pagination = paginationRaw
+      ? JSON.parse(paginationRaw)
+      : {
+          page: 1,
+          pageSize: 10
+        }
     const filters = filtersRaw ? JSON.parse(filtersRaw) : {}
     const { cod_seller } = filters
 
@@ -89,9 +91,9 @@ module.exports = {
             RTRIM(SA3.A3_NOME) AS Nome_Vendedor,
             RTRIM(SA1.A1_ZZVEND2) AS Cod_Vendedor2,
             RTRIM(SA3_1.A3_NOME) AS Nome_Vendedor2,
-            CASE 
-              WHEN SA1.A1_ULTCOM IS NULL OR SA1.A1_ULTCOM = '' 
-              THEN '' 
+            CASE
+              WHEN SA1.A1_ULTCOM IS NULL OR SA1.A1_ULTCOM = ''
+              THEN ''
               ELSE RIGHT('0' + CAST(DATEPART(DAY, SA1.A1_ULTCOM) AS VARCHAR(2)), 2) + '/' +
                 RIGHT('0' + CAST(DATEPART(MONTH, SA1.A1_ULTCOM) AS VARCHAR(2)), 2) + '/' +
                 CAST(DATEPART(YEAR, SA1.A1_ULTCOM) AS VARCHAR(4))
@@ -99,7 +101,7 @@ module.exports = {
           FROM dbo.SA1010 AS SA1 WITH (NOLOCK)
           LEFT OUTER JOIN dbo.SA3010 AS SA3_1 ON LEFT(SA1.A1_FILIAL, 2) = LEFT(SA3_1.A3_FILIAL, 2) AND SA1.A1_ZZVEND2 = SA3_1.A3_COD
           LEFT OUTER JOIN dbo.SA3010 AS SA3 ON SA1.A1_VEND = SA3.A3_COD AND LEFT(SA1.A1_FILIAL, 2) = LEFT(SA3.A3_FILIAL, 2)
-          WHERE 
+          WHERE
             ${filial_condition}
             ${generic_condition}
             ${cod_seller_condition}
@@ -131,9 +133,9 @@ module.exports = {
             RTRIM(SA3.A3_NOME) AS Nome_Vendedor,
             RTRIM(SA1.A1_ZZVEND2) AS Cod_Vendedor2,
             RTRIM(SA3_1.A3_NOME) AS Nome_Vendedor2,
-            CASE 
-              WHEN SA1.A1_ULTCOM IS NULL OR SA1.A1_ULTCOM = '' 
-              THEN '' 
+            CASE
+              WHEN SA1.A1_ULTCOM IS NULL OR SA1.A1_ULTCOM = ''
+              THEN ''
               ELSE RIGHT('0' + CAST(DATEPART(DAY, SA1.A1_ULTCOM) AS VARCHAR(2)), 2) + '/' +
                 RIGHT('0' + CAST(DATEPART(MONTH, SA1.A1_ULTCOM) AS VARCHAR(2)), 2) + '/' +
                 CAST(DATEPART(YEAR, SA1.A1_ULTCOM) AS VARCHAR(4))
@@ -141,7 +143,7 @@ module.exports = {
           FROM dbo.SA1010 AS SA1 WITH (NOLOCK)
           LEFT OUTER JOIN dbo.SA3010 AS SA3_1 ON LEFT(SA1.A1_FILIAL, 2) = LEFT(SA3_1.A3_FILIAL, 2) AND SA1.A1_ZZVEND2 = SA3_1.A3_COD
           LEFT OUTER JOIN dbo.SA3010 AS SA3 ON SA1.A1_VEND = SA3.A3_COD AND LEFT(SA1.A1_FILIAL, 2) = LEFT(SA3.A3_FILIAL, 2)
-          WHERE 
+          WHERE
             ${filial_condition}
             ${generic_condition}
             ${cod_seller_condition}
@@ -154,9 +156,9 @@ module.exports = {
       const clients = await request.query(query)
 
       const total = await request.query(`
-        SELECT COUNT(*) AS total 
+        SELECT COUNT(*) AS total
         FROM SA1010 AS SA1
-        WHERE 
+        WHERE
             ${filial_condition}
             ${generic_condition}
             ${cod_seller_condition}
