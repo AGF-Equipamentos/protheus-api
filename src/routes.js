@@ -22,6 +22,7 @@ const CdeBudgetController = require('./controllers/CdeBudgetController')
 const DefaultersController = require('./controllers/DefaultersController')
 const FatGroupedByStateController = require('./controllers/FatGroupedByStateController')
 const FatGroupedBySellerController = require('./controllers/FatGroupedBySellerController')
+const ReportClientController = require('./controllers/ReportClientController')
 
 routes.get('/estoques', EstoqueController.index)
 routes.get('/pcs', PCsController.index)
@@ -44,5 +45,6 @@ routes.get('/cdebudget', CdeBudgetController.index)
 routes.get('/group-fat-state', FatGroupedByStateController.index)
 routes.get('/group-fat-seller', FatGroupedBySellerController.index)
 routes.get('/defaulters', DefaultersController.index)
+routes.get('/reportclient', ReportClientController.index)
 
 module.exports = routes
