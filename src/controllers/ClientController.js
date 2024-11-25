@@ -4,13 +4,14 @@ module.exports = {
   async index(req, res) {
     const request = new sql.Request()
 
-    const { filial, cnpj: raw_cnpj = '', company_name } = req.query
+    const { filial, cnpj: raw_cnpj = '', company_name, client_cod } = req.query
 
     const cnpj = raw_cnpj.replace(/[^0-9]/g, '')
 
     let filial_condition
     let cnpj_condition
     let company_name_condition
+    let client_cod_condition
 
     if (filial) {
       filial_condition = `SA1.A1_FILIAL IN ('${filial}') AND`
@@ -28,6 +29,12 @@ module.exports = {
       company_name_condition = `SA1.A1_NOME = '${company_name}' AND`
     } else {
       company_name_condition = ``
+    }
+
+    if (client_cod) {
+      client_cod_condition = `SA1.A1_COD = '${client_cod}' AND`
+    } else {
+      client_cod_condition = ``
     }
 
     // query to the database and get the records
@@ -57,6 +64,7 @@ module.exports = {
                     ${company_name_condition}
                     ${cnpj_condition}
                     ${filial_condition}
+                    ${client_cod_condition}
                     SA1.A1_MSBLQL <> 1 AND
                     SA1.D_E_L_E_T_ = ''
 
