@@ -131,6 +131,7 @@ module.exports = {
                     SC7.C7_COND AS COND_PAGTO,
                     SE4.E4_DESCRI AS DESC_PAGTO,
                     SC7.C7_VLDESC AS DESCONTO,
+                    SC7.C7_DESPESA AS DESPESAS,
                     SC7.C7_NUMSC AS NUMSC,
                     RTRIM(SC7.C7_OBS) AS OBS,
                     SC7.C7_FORNECE AS FORN,
