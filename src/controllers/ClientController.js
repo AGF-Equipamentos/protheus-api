@@ -45,7 +45,7 @@ module.exports = {
     }
 
     if (seller_cod) {
-      seller_cod_condition = `SA1.A1_VEND = '${seller_cod}' AND`
+      seller_cod_condition = `SA1.A1_VEND = IN ('${seller_cod}') AND`
     } else {
       seller_cod_condition = ``
     }
