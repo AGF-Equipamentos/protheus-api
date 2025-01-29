@@ -12,12 +12,12 @@ module.exports = {
     } = req.query
 
     const pagination = paginationRaw
-      ? JSON.parse(paginationRaw)
+      ? paginationRaw
       : {
           page: 1,
           pageSize: 10
         }
-    const filters = filtersRaw ? JSON.parse(filtersRaw) : {}
+    const filters = filtersRaw ? filtersRaw : {}
     const { cod_seller } = filters
 
     const columnsKeys = {
