@@ -5,6 +5,7 @@ const axios = require('axios')
 const twilio = require('twilio')
 const Sentry = require('@sentry/node')
 const Joi = require('joi')
+const { format } = require('date-fns')
 
 module.exports = {
   async index(req, res) {
@@ -213,10 +214,15 @@ module.exports = {
         })
       }
 
+      const notFoundItems = []
+      const tagFoundItems = []
+
       if (messageItems.length !== budgetItems.length) {
         messageItems = message.split('\n').map((item) => ({
           partNumber: item
             .split(';')[0]
+            // remove caracteres especiais,
+            // considerar YAH-23 e YAH23 a mesma coisa (solicitação do Alex)
             .replace(/[^a-zA-Z0-9]/g, '')
             .toUpperCase(),
           qty: Number(item.split(';')[1])
@@ -261,21 +267,35 @@ module.exports = {
 
         if (partNumbersFound.length > 0) {
           messageItems.forEach((item) => {
-            const partNumber = partNumbersFound.find(
-              (partNumber) => partNumber.part_number === item.partNumber
-            )
+            const partNumbers = partNumbersFound.reduce((acc, partNumber) => {
+              if (partNumber.part_number === item.partNumber) {
+                acc.push(partNumber)
+              }
+              return acc
+            }, [])
 
             const itemAlreadyFoundInProtheus = budgetItems.find(
-              (budgetItem) => budgetItem.produto === item.partNumber
+              (budgetItem) =>
+                budgetItem.produto
+                  .replace(/[^a-zA-Z0-9]/g, '')
+                  .toUpperCase() === item.partNumber
             )
 
-            if (!itemAlreadyFoundInProtheus && partNumber) {
-              budgetItems.push({
-                produto: partNumber.codigo,
-                quantidade: item.qty,
-                tipo_operacao: '01',
-                part_number: partNumber.part_number
-              })
+            if (!itemAlreadyFoundInProtheus && partNumbers.length > 0) {
+              // adicionar todos os itens correspondentes no orçamento, foi solicitado
+              // pelos casos com "MF" no final
+              partNumbers.forEach((pn) =>
+                budgetItems.push({
+                  produto: pn.codigo,
+                  quantidade: item.qty,
+                  tipo_operacao: '01',
+                  part_number: pn.part_number
+                })
+              )
+              tagFoundItems.push(item)
+            }
+            if (!itemAlreadyFoundInProtheus && partNumbers.length === 0) {
+              notFoundItems.push(item)
             }
           })
         }
@@ -285,10 +305,49 @@ module.exports = {
         })
       }
 
+      if (notFoundItems.length > 0) {
+        const lastItem = await request.query(
+          `
+                SELECT TOP 1 R_E_C_N_O_ as recno
+                FROM    SZ3010 AS SZ3 WITH (NOLOCK)
+        ORDER BY R_E_C_N_O_ DESC
+                `
+        )
+        let sequence = Number(lastItem.recordset[0].recno) + 1
+
+        const today = new Date()
+
+        for (const item of notFoundItems) {
+          await request.query(
+            `
+                  INSERT INTO SZ3010 (
+                    Z3_FILIAL, Z3_SEQUENC, Z3_DATA,
+                    Z3_HORA,
+                    Z3_PARNUMB, Z3_DETALHE, R_E_C_N_O_
+                  )
+                  VALUES (
+                    '02',
+                    '${sequence.toString().padStart(7, '0')}',
+                    '${format(today, 'yyyyMMdd')}',
+                    '${format(today, 'HH:mm:ss')}',
+                    '${item.partNumber}',
+                    'REGISTRO NÃO ENCONTRADO',
+                    ${sequence}
+                  )
+                  `
+          )
+          sequence++
+        }
+      }
+
       Sentry.setContext('budgetItems', {
         budgetCodes: JSON.stringify(budgetCodes),
         partNumberProtheus: JSON.stringify(partNumberProtheus),
         budgetItems: JSON.stringify(budgetItems)
+      })
+
+      return res.json({
+        budgetItems
       })
 
       const budgetResponse = await api.post(
