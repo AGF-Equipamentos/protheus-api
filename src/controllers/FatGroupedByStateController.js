@@ -5,10 +5,11 @@ module.exports = {
   async index(req, res) {
     const request = new sql.Request()
 
-    const { branch, year } = req.query
+    const { branch, year, state } = req.query
 
     let branch_condition
     let year_condition
+    let state_condition
 
     if (year != null) {
       if (typeof year === 'object') {
@@ -28,6 +29,16 @@ module.exports = {
       }
     } else {
       branch_condition = ``
+    }
+
+    if (state != null) {
+      if (typeof state === 'object') {
+        state_condition = `A1_EST IN ('${state.join(`','`)}') AND`
+      } else {
+        state_condition = `A1_EST IN ('${state}') AND`
+      }
+    } else {
+      state_condition = ``
     }
 
     const piecesGroups = groupsByType
@@ -52,6 +63,7 @@ module.exports = {
         WHERE
           ${year_condition}
           ${branch_condition}
+          ${state_condition}
           F4_DUPLIC = 'S'
           AND A1_EST IS NOT NULL
         GROUP BY ANO, MES, A1_EST
@@ -72,6 +84,7 @@ module.exports = {
         WHERE
           ${year_condition}
           ${branch_condition}
+          ${state_condition}
           F4_DUPLIC = 'S'
           AND A1_EST IS NOT NULL
         GROUP BY ANO, MES, A1_EST, BM_DESC
@@ -128,75 +141,73 @@ module.exports = {
             // Adicionar objeto atual ao array processado
             processedData.push(currentObj)
 
-            if (i < data.length - 1) {
-              const nextObj = data[i + 1]
-              const nextGRUPO = nextObj.GRUPO
-              const nextESTADO = nextObj.ESTADO
+            const nextObj = data[i + 1]
+            const nextGRUPO = nextObj?.GRUPO
+            const nextESTADO = nextObj?.ESTADO
 
-              if (nextGRUPO === GRUPO && nextESTADO === ESTADO) {
-                const nextANO = nextObj.ANO
-                const nextMES = nextObj.MES
+            if (nextGRUPO === GRUPO && nextESTADO === ESTADO) {
+              const nextANO = nextObj.ANO
+              const nextMES = nextObj.MES
 
-                const diffYears = parseInt(nextANO) - parseInt(ANO)
-                const diffMonths =
-                  diffYears * 12 + (parseInt(nextMES) - parseInt(MES))
+              const diffYears = parseInt(nextANO) - parseInt(ANO)
+              const diffMonths =
+                diffYears * 12 + (parseInt(nextMES) - parseInt(MES))
 
-                if (diffMonths > 1) {
-                  // Adicionar objetos dos meses faltantes
-                  let currentYear = parseInt(ANO)
-                  let currentMonth = parseInt(MES)
-
-                  for (let j = 1; j < diffMonths; j++) {
-                    currentMonth += 1
-
-                    if (currentMonth > 12) {
-                      currentMonth = 1
-                      currentYear += 1
-                    }
-
-                    const missingMonth = String(currentMonth).padStart(2, '0')
-
-                    processedData.push({
-                      FAT: 0,
-                      ANO: String(currentYear),
-                      MES: missingMonth,
-                      GRUPO,
-                      ESTADO
-                    })
-                  }
-                }
-              } else {
+              if (diffMonths > 1) {
+                // Adicionar objetos dos meses faltantes
                 let currentYear = parseInt(ANO)
                 let currentMonth = parseInt(MES)
 
-                const latestYear = parseInt(latestYearMonth.ANO)
-                const latestMonth = parseInt(latestYearMonth.MES)
+                for (let j = 1; j < diffMonths; j++) {
+                  currentMonth += 1
 
-                while (
-                  currentYear < latestYear ||
-                  (currentYear === latestYear && currentMonth < latestMonth)
-                ) {
-                  let nextMonth = currentMonth + 1
-                  let nextYear = currentYear
-
-                  if (nextMonth > 12) {
-                    nextMonth = 1
-                    nextYear += 1
+                  if (currentMonth > 12) {
+                    currentMonth = 1
+                    currentYear += 1
                   }
 
-                  const missingMonth = String(nextMonth).padStart(2, '0')
+                  const missingMonth = String(currentMonth).padStart(2, '0')
 
                   processedData.push({
                     FAT: 0,
-                    ANO: String(nextYear),
+                    ANO: String(currentYear),
                     MES: missingMonth,
                     GRUPO,
                     ESTADO
                   })
-
-                  currentMonth = nextMonth
-                  currentYear = nextYear
                 }
+              }
+            } else {
+              let currentYear = parseInt(ANO)
+              let currentMonth = parseInt(MES)
+
+              const latestYear = parseInt(latestYearMonth.ANO)
+              const latestMonth = parseInt(latestYearMonth.MES)
+
+              while (
+                currentYear < latestYear ||
+                (currentYear === latestYear && currentMonth < latestMonth)
+              ) {
+                let nextMonth = currentMonth + 1
+                let nextYear = currentYear
+
+                if (nextMonth > 12) {
+                  nextMonth = 1
+                  nextYear += 1
+                }
+
+                const missingMonth = String(nextMonth).padStart(2, '0')
+
+                processedData.push({
+                  FAT: 0,
+                  ANO: String(nextYear),
+                  MES: missingMonth,
+                  GRUPO,
+                  ESTADO
+                })
+
+                currentMonth = nextMonth
+                currentYear = nextYear
               }
             }
           }
