@@ -5,6 +5,7 @@ const axios = require('axios')
 const twilio = require('twilio')
 const Sentry = require('@sentry/node')
 const Joi = require('joi')
+const { format } = require('date-fns')
 
 module.exports = {
   async index(req, res) {
@@ -83,9 +84,11 @@ module.exports = {
                     RTRIM(SA1.A1_CONTRIB) AS taxpayer,
                     RTRIM(SA1.A1_EST) AS clientState,
                     RTRIM(SA1.A1_LOJA) AS clientStore,
-                    RTRIM(SA1.A1_VEND) AS seller
+                    RTRIM(SA1.A1_VEND) AS seller,
+				            RTRIM(SA3.A3_NOME) AS seller_name
 
             FROM    SA1010 AS SA1 WITH (NOLOCK)
+            inner join SA3010 as SA3 WITH (NOLOCK) on SA3.A3_FILIAL = SA1.A1_FILIAL AND SA3.A3_COD = SA1.A1_VEND
 
             WHERE
                     ${branch_condition}
@@ -102,6 +105,7 @@ module.exports = {
       const clientState = client_data.recordsets[0][0].clientState
       const clientStore = client_data.recordsets[0][0].clientStore
       const seller = client_data.recordsets[0][0].seller
+      const seller_name = client_data.recordsets[0][0].seller_name
 
       Sentry.setContext('clientData', {
         clientData: client_data.recordsets[0][0]
@@ -213,10 +217,19 @@ module.exports = {
         })
       }
 
+      const protheusFoundItems = budgetItems.map((item) => ({
+        partNumber: item.part_number,
+        qty: item.quantidade
+      }))
+      const notFoundItems = []
+      const tagFoundItems = []
+
       if (messageItems.length !== budgetItems.length) {
         messageItems = message.split('\n').map((item) => ({
           partNumber: item
             .split(';')[0]
+            // remove caracteres especiais,
+            // considerar YAH-23 e YAH23 a mesma coisa (solicitação do Alex)
             .replace(/[^a-zA-Z0-9]/g, '')
             .toUpperCase(),
           qty: Number(item.split(';')[1])
@@ -261,21 +274,35 @@ module.exports = {
 
         if (partNumbersFound.length > 0) {
           messageItems.forEach((item) => {
-            const partNumber = partNumbersFound.find(
-              (partNumber) => partNumber.part_number === item.partNumber
-            )
+            const partNumbers = partNumbersFound.reduce((acc, partNumber) => {
+              if (partNumber.part_number === item.partNumber) {
+                acc.push(partNumber)
+              }
+              return acc
+            }, [])
 
             const itemAlreadyFoundInProtheus = budgetItems.find(
-              (budgetItem) => budgetItem.produto === item.partNumber
+              (budgetItem) =>
+                budgetItem.produto
+                  .replace(/[^a-zA-Z0-9]/g, '')
+                  .toUpperCase() === item.partNumber
             )
 
-            if (!itemAlreadyFoundInProtheus && partNumber) {
-              budgetItems.push({
-                produto: partNumber.codigo,
-                quantidade: item.qty,
-                tipo_operacao: '01',
-                part_number: partNumber.part_number
-              })
+            if (!itemAlreadyFoundInProtheus && partNumbers.length > 0) {
+              // adicionar todos os itens correspondentes no orçamento, foi solicitado
+              // pelos casos com "MF" no final
+              partNumbers.forEach((pn) =>
+                budgetItems.push({
+                  produto: pn.codigo,
+                  quantidade: item.qty,
+                  tipo_operacao: '01',
+                  part_number: pn.part_number
+                })
+              )
+              tagFoundItems.push(item)
+            }
+            if (!itemAlreadyFoundInProtheus && partNumbers.length === 0) {
+              notFoundItems.push(item)
             }
           })
         }
@@ -283,6 +310,64 @@ module.exports = {
         Sentry.setContext('partNumbers', {
           partNumbers: JSON.stringify(partNumbersFound)
         })
+      }
+
+      const lastItem = await request.query(
+        `
+              SELECT TOP 1 R_E_C_N_O_ as recno
+              FROM    SZ3010 AS SZ3 WITH (NOLOCK)
+      ORDER BY R_E_C_N_O_ DESC
+              `
+      )
+      let sequence = Number(lastItem.recordset[0].recno) + 1
+      const today = new Date()
+
+      for (const item of notFoundItems) {
+        await request.query(
+          `
+                  INSERT INTO SZ3010 (
+                    Z3_FILIAL, Z3_SEQUENC, Z3_DATA,
+                    Z3_HORA,
+                    Z3_PARNUMB, Z3_DETALHE, Z3_CODUSUA, Z3_NOMUSUA, R_E_C_N_O_
+                  )
+                  VALUES (
+                    '02',
+                    '${sequence.toString().padStart(7, '0')}',
+                    '${format(today, 'yyyyMMdd')}',
+                    '${format(today, 'HH:mm:ss')}',
+                    '${item.partNumber}',
+                    'REGISTRO NÃO ENCONTRADO',
+                    '${seller}',
+                    '${seller_name}',
+                    ${sequence}
+                  )
+                  `
+        )
+        sequence++
+      }
+
+      for (const item of [...protheusFoundItems, ...tagFoundItems]) {
+        await request.query(
+          `
+                  INSERT INTO SZ3010 (
+                    Z3_FILIAL, Z3_SEQUENC, Z3_DATA,
+                    Z3_HORA,
+                    Z3_PARNUMB, Z3_DETALHE, Z3_CODUSUA, Z3_NOMUSUA, R_E_C_N_O_
+                  )
+                  VALUES (
+                    '02',
+                    '${sequence.toString().padStart(7, '0')}',
+                    '${format(today, 'yyyyMMdd')}',
+                    '${format(today, 'HH:mm:ss')}',
+                    '${item.partNumber}',
+                    'REGISTRO ENCONTRADO',
+                    '${seller}',
+                    '${seller_name}',
+                    ${sequence}
+                  )
+                  `
+        )
+        sequence++
       }
 
       Sentry.setContext('budgetItems', {
