@@ -84,9 +84,11 @@ module.exports = {
                     RTRIM(SA1.A1_CONTRIB) AS taxpayer,
                     RTRIM(SA1.A1_EST) AS clientState,
                     RTRIM(SA1.A1_LOJA) AS clientStore,
-                    RTRIM(SA1.A1_VEND) AS seller
+                    RTRIM(SA1.A1_VEND) AS seller,
+				            RTRIM(SA3.A3_NOME) AS seller_name
 
             FROM    SA1010 AS SA1 WITH (NOLOCK)
+            inner join SA3010 as SA3 WITH (NOLOCK) on SA3.A3_FILIAL = SA1.A1_FILIAL AND SA3.A3_COD = SA1.A1_VEND
 
             WHERE
                     ${branch_condition}
@@ -103,6 +105,7 @@ module.exports = {
       const clientState = client_data.recordsets[0][0].clientState
       const clientStore = client_data.recordsets[0][0].clientStore
       const seller = client_data.recordsets[0][0].seller
+      const seller_name = client_data.recordsets[0][0].seller_name
 
       Sentry.setContext('clientData', {
         clientData: client_data.recordsets[0][0]
@@ -214,6 +217,10 @@ module.exports = {
         })
       }
 
+      const protheusFoundItems = budgetItems.map((item) => ({
+        partNumber: item.part_number,
+        qty: item.quantidade
+      }))
       const notFoundItems = []
       const tagFoundItems = []
 
@@ -323,7 +330,7 @@ module.exports = {
                   INSERT INTO SZ3010 (
                     Z3_FILIAL, Z3_SEQUENC, Z3_DATA,
                     Z3_HORA,
-                    Z3_PARNUMB, Z3_DETALHE, R_E_C_N_O_
+                    Z3_PARNUMB, Z3_DETALHE, Z3_CODUSUA, Z3_NOMUSUA, R_E_C_N_O_
                   )
                   VALUES (
                     '02',
@@ -332,6 +339,32 @@ module.exports = {
                     '${format(today, 'HH:mm:ss')}',
                     '${item.partNumber}',
                     'REGISTRO NÃO ENCONTRADO',
+                    '${seller}',
+                    '${seller_name}',
+                    ${sequence}
+                  )
+                  `
+          )
+          sequence++
+        }
+
+        for (const item of [...protheusFoundItems, ...tagFoundItems]) {
+          await request.query(
+            `
+                  INSERT INTO SZ3010 (
+                    Z3_FILIAL, Z3_SEQUENC, Z3_DATA,
+                    Z3_HORA,
+                    Z3_PARNUMB, Z3_DETALHE, Z3_CODUSUA, Z3_NOMUSUA, R_E_C_N_O_
+                  )
+                  VALUES (
+                    '02',
+                    '${sequence.toString().padStart(7, '0')}',
+                    '${format(today, 'yyyyMMdd')}',
+                    '${format(today, 'HH:mm:ss')}',
+                    '${item.partNumber}',
+                    'REGISTRO ENCONTRADO',
+                    '${seller}',
+                    '${seller_name}',
                     ${sequence}
                   )
                   `
@@ -344,10 +377,6 @@ module.exports = {
         budgetCodes: JSON.stringify(budgetCodes),
         partNumberProtheus: JSON.stringify(partNumberProtheus),
         budgetItems: JSON.stringify(budgetItems)
-      })
-
-      return res.json({
-        budgetItems
       })
 
       const budgetResponse = await api.post(
