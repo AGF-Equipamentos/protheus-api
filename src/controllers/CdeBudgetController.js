@@ -312,21 +312,19 @@ module.exports = {
         })
       }
 
-      if (notFoundItems.length > 0) {
-        const lastItem = await request.query(
+      const lastItem = await request.query(
+        `
+              SELECT TOP 1 R_E_C_N_O_ as recno
+              FROM    SZ3010 AS SZ3 WITH (NOLOCK)
+      ORDER BY R_E_C_N_O_ DESC
+              `
+      )
+      let sequence = Number(lastItem.recordset[0].recno) + 1
+      const today = new Date()
+
+      for (const item of notFoundItems) {
+        await request.query(
           `
-                SELECT TOP 1 R_E_C_N_O_ as recno
-                FROM    SZ3010 AS SZ3 WITH (NOLOCK)
-        ORDER BY R_E_C_N_O_ DESC
-                `
-        )
-        let sequence = Number(lastItem.recordset[0].recno) + 1
-
-        const today = new Date()
-
-        for (const item of notFoundItems) {
-          await request.query(
-            `
                   INSERT INTO SZ3010 (
                     Z3_FILIAL, Z3_SEQUENC, Z3_DATA,
                     Z3_HORA,
@@ -344,13 +342,13 @@ module.exports = {
                     ${sequence}
                   )
                   `
-          )
-          sequence++
-        }
+        )
+        sequence++
+      }
 
-        for (const item of [...protheusFoundItems, ...tagFoundItems]) {
-          await request.query(
-            `
+      for (const item of [...protheusFoundItems, ...tagFoundItems]) {
+        await request.query(
+          `
                   INSERT INTO SZ3010 (
                     Z3_FILIAL, Z3_SEQUENC, Z3_DATA,
                     Z3_HORA,
@@ -368,9 +366,8 @@ module.exports = {
                     ${sequence}
                   )
                   `
-          )
-          sequence++
-        }
+        )
+        sequence++
       }
 
       Sentry.setContext('budgetItems', {
