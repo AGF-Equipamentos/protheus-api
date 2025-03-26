@@ -68,11 +68,11 @@ module.exports = {
                     RTRIM(SA1.A1_CONTATO) AS contato,
                     RTRIM(SA1.A1_EMAIL) AS email,
                     RTRIM(SA1.A1_TEL) AS telefone,
-                    RTRIM(dbo.CCH010.CCH_PAIS) AS pais,
+                    RTRIM(SYA.YA_DESCR) AS pais,
 					          RTRIM(SA1.A1_VEND) AS codigo_vendedor
 
             FROM    SA1010 AS SA1 WITH (NOLOCK) LEFT OUTER JOIN
-                    dbo.CCH010 ON LEFT(SA1.A1_FILIAL, 2) = LEFT(dbo.CCH010.CCH_FILIAL, 2) AND SA1.A1_CODPAIS = dbo.CCH010.CCH_CODIGO
+                    dbo.SYA010 AS SYA ON SA1.A1_PAIS = SYA.YA_CODGI AND LEFT(SA1.A1_FILIAL, 2) = LEFT(SYA.YA_FILIAL, 2)
 
             WHERE
                     ${company_name_condition}
