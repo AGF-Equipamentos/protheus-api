@@ -69,7 +69,8 @@ module.exports = {
                     RTRIM(SA1.A1_EMAIL) AS email,
                     RTRIM(SA1.A1_TEL) AS telefone,
                     RTRIM(SYA.YA_DESCR) AS pais,
-					          RTRIM(SA1.A1_VEND) AS codigo_vendedor
+					          RTRIM(SA1.A1_VEND) AS codigo_vendedor,
+                    RTRIM(SA1.A1_CONTRIB) AS icms
 
             FROM    SA1010 AS SA1 WITH (NOLOCK) LEFT OUTER JOIN
                     dbo.SYA010 AS SYA ON SA1.A1_PAIS = SYA.YA_CODGI AND LEFT(SA1.A1_FILIAL, 2) = LEFT(SYA.YA_FILIAL, 2)
