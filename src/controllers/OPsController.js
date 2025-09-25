@@ -75,8 +75,8 @@ module.exports = {
     }
 
     // query to the database and get the records
-    await request.query(
-      `
+
+    const query = `
             SELECT  RTRIM(SC2.C2_PRODUTO) AS PRODUTO,
                     RTRIM(SB1.B1_DESC) AS DESCRICAO,
                     SC2.C2_NUM + SC2.C2_ITEM + SC2.C2_SEQUEN AS OP,
@@ -92,7 +92,7 @@ module.exports = {
                     SC2.C2_QUJE AS QTD_PRO
 
             FROM    SC2010 AS SC2 WITH (NOLOCK) LEFT OUTER JOIN
-                    SB1010 AS SB1 WITH (NOLOCK) ON SB1.D_E_L_E_T_ = '' AND SB1.B1_COD = SC2.C2_PRODUTO
+                    SB1010 AS SB1 WITH (NOLOCK) ON SB1.D_E_L_E_T_ = '' AND SB1.B1_COD = SC2.C2_PRODUTO AND SB1.B1_FILIAL = LEFT(SC2.C2_FILIAL, 2)
 
             WHERE   ${filial_condition}
                     ${produto_condition}
@@ -105,20 +105,19 @@ module.exports = {
                     (SC2.D_E_L_E_T_ = '')
 
             ORDER BY SC2.C2_DATPRI
-            `,
-      function (err, recordset) {
-        if (err) {
-          console.log(err)
-          return res.json({
-            error: {
-              message: err
-            }
-          })
-        }
-
-        return res.json(recordset.recordsets[0])
-        // send records as a response
+            `
+    await request.query(query, function (err, recordset) {
+      if (err) {
+        console.log(err)
+        return res.json({
+          error: {
+            message: err
+          }
+        })
       }
-    )
+
+      return res.json(recordset.recordsets[0])
+      // send records as a response
+    })
   }
 }
