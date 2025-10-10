@@ -48,6 +48,7 @@ module.exports = {
                     RTRIM(SC1.C1_PRODUTO) AS PRODUTO,
                     RTRIM(SC1.C1_DESCRI) AS DESCRICAO,
                     SC1.C1_UM AS UM,
+                    SC1.C1_CC AS CC,
                     SC1.C1_QUANT AS QTD,
                     SC1.C1_QUJE AS QTD_ENT,
                     SC1.C1_QUANT - SC1.C1_QUJE AS SALDO,
